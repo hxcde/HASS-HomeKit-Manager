@@ -172,7 +172,7 @@ const en = {
     "This device ({type}) also works on a bridge. A standalone accessory needs its own pairing.",
   accessory_name_helper: "Shown in the Home app. A–Z, digits and spaces; umlauts are rewritten.",
   // Entity options
-  link_auto: "Automatic (same device)",
+  link_auto: "Automatic",
   link_same_device: "same device",
   code_title: "Code",
   code_label: "Code for HomeKit",
@@ -187,6 +187,9 @@ const en = {
     "Shown inside the same HomeKit accessory. “Automatic” uses matching sensors of the same device.",
   battery_title: "Battery",
   battery_threshold: "Low battery warning (%)",
+  battery_toggle: "Device has a battery",
+  battery_detected: "Battery sensor found on this device – linked automatically.",
+  battery_hint: "Turn on to show the battery level in the Home app.",
   standalone_title: "Standalone accessory with its own pairing",
   action_options: "Device options",
   // Rules
@@ -400,7 +403,7 @@ const de: Strings = {
     "Dieses Gerät ({type}) funktioniert auch in einer Bridge. Als Einzelgerät braucht es eine eigene Kopplung.",
   accessory_name_helper:
     "Wird in der Home-App angezeigt. A–Z, Ziffern und Leerzeichen; Umlaute werden umgeschrieben.",
-  link_auto: "Automatisch (vom selben Gerät)",
+  link_auto: "Automatisch",
   link_same_device: "gleiches Gerät",
   code_title: "Code",
   code_label: "Code für HomeKit",
@@ -415,6 +418,9 @@ const de: Strings = {
     "Werden im selben HomeKit-Gerät angezeigt. „Automatisch“ nimmt passende Sensoren vom selben Gerät.",
   battery_title: "Batterie",
   battery_threshold: "Warnung bei niedrigem Akku (%)",
+  battery_toggle: "Gerät hat eine Batterie",
+  battery_detected: "Batteriesensor am Gerät erkannt – wird automatisch verknüpft.",
+  battery_hint: "Einschalten, um den Akkustand in der Home-App anzuzeigen.",
   standalone_title: "Einzelgerät mit eigener Kopplung",
   action_options: "Geräteoptionen",
   rules_button: "Automatisch",

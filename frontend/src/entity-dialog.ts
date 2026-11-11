@@ -29,6 +29,7 @@ import { effectivePatch } from "./options";
 import { controls, icon, tokens } from "./styles";
 
 const CODE_DOMAINS = ["alarm_control_panel", "lock"];
+const BATTERY_KEYS = ["linked_battery_sensor", "linked_battery_charging_sensor"];
 
 /**
  * Per-entity HomeKit options: assignment, name, type, code, media player
@@ -52,6 +53,7 @@ export class HkmEntityDialog extends LitElement {
     _values: { state: true },
     _code: { state: true },
     _clearCode: { state: true },
+    _battery: { state: true },
   };
 
   declare hass: HomeAssistant;
@@ -70,6 +72,7 @@ export class HkmEntityDialog extends LitElement {
   declare _values: EntityOptions;
   declare _code: string;
   declare _clearCode: boolean;
+  declare _battery: boolean;
 
   willUpdate(changed: PropertyValues) {
     if (changed.has("entity") || changed.has("options") || changed.has("assigned")) {
@@ -78,6 +81,7 @@ export class HkmEntityDialog extends LitElement {
       this._values = values;
       this._code = "";
       this._clearCode = false;
+      this._battery = this._batteryDetected() || this._batteryConfigured();
     }
   }
 
@@ -96,6 +100,9 @@ export class HkmEntityDialog extends LitElement {
     keys.delete("code");
     for (const key of keys) edited[key] = this._values[key] ?? null;
     if (typeof edited.name === "string") edited.name = edited.name.trim() || null;
+    if (!this._battery) {
+      for (const key of [...BATTERY_KEYS, "low_battery_threshold"]) edited[key] = null;
+    }
     if (this._clearCode) edited.code = null;
     else if (this._code) edited.code = this._code;
     fire(this, "save-entity", {
@@ -266,12 +273,67 @@ export class HkmEntityDialog extends LitElement {
     </section>`;
   }
 
+  /** A battery sensor exists on the same device (core links it automatically). */
+  private _batteryDetected(): boolean {
+    const device = this.entity?.device_id;
+    if (!device) return false;
+    return (this.linkCandidates ?? []).some(
+      (c) =>
+        c.device_id === device &&
+        (c.device_class === "battery" || c.device_class === "battery_charging"),
+    );
+  }
+
+  private _batteryConfigured(): boolean {
+    const options = this.options ?? {};
+    return BATTERY_KEYS.some((key) => options[key]) || Boolean(options.low_battery_threshold);
+  }
+
+  private _renderBattery(battery: [string, LinkField][]) {
+    const t = this.t;
+    const detected = this._batteryDetected();
+    return html`<section class="battery">
+      <label class="toggle-row" @click=${() => (this._battery = !this._battery)}>
+        <span class="toggle-icon">${icon(mdiBatteryHigh)}</span>
+        <span class="toggle-text">
+          <span class="toggle-title">${t("battery_toggle")}</span>
+          <span class="toggle-sub">${t(detected ? "battery_detected" : "battery_hint")}</span>
+        </span>
+        <button
+          class="switch"
+          role="switch"
+          aria-checked=${String(this._battery)}
+          aria-label=${t("battery_toggle")}
+        ></button>
+      </label>
+      ${this._battery
+        ? html`<div class="grid">
+            ${battery.map(([key, field]) => this._linkSelect(key, field))}
+            <div class="field">
+              <label for="hk-threshold">${t("battery_threshold")}</label>
+              <input
+                id="hk-threshold"
+                type="number"
+                min="1"
+                max="99"
+                placeholder="20"
+                .value=${String(this._values.low_battery_threshold ?? "")}
+                @input=${(ev: InputEvent) => {
+                  const raw = (ev.target as HTMLInputElement).value;
+                  this._set("low_battery_threshold", raw ? Number(raw) : null);
+                }}
+              />
+            </div>
+          </div>`
+        : nothing}
+    </section>`;
+  }
+
   private _renderLinks() {
     const t = this.t;
     const links = this._links();
     const main = links.filter(([key]) => !isBatteryLink(key));
     const battery = links.filter(([key]) => isBatteryLink(key));
-    const batteryOpen = battery.some(([key]) => this._values[key]) || this._values.low_battery_threshold;
     return html`
       ${main.length
         ? html`<section>
@@ -280,29 +342,7 @@ export class HkmEntityDialog extends LitElement {
             <div class="grid">${main.map(([key, field]) => this._linkSelect(key, field))}</div>
           </section>`
         : nothing}
-      ${battery.length
-        ? html`<details ?open=${Boolean(batteryOpen)}>
-            <summary>${icon(mdiBatteryHigh)} ${t("battery_title")}</summary>
-            <div class="grid">
-              ${battery.map(([key, field]) => this._linkSelect(key, field))}
-              <div class="field">
-                <label for="hk-threshold">${t("battery_threshold")}</label>
-                <input
-                  id="hk-threshold"
-                  type="number"
-                  min="1"
-                  max="99"
-                  placeholder="20"
-                  .value=${String(this._values.low_battery_threshold ?? "")}
-                  @input=${(ev: InputEvent) => {
-                    const raw = (ev.target as HTMLInputElement).value;
-                    this._set("low_battery_threshold", raw ? Number(raw) : null);
-                  }}
-                />
-              </div>
-            </div>
-          </details>`
-        : nothing}
+      ${battery.length ? this._renderBattery(battery) : nothing}
     `;
   }
 
@@ -507,34 +547,45 @@ export class HkmEntityDialog extends LitElement {
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 12px 16px;
       }
-      details {
-        border-top: 1px solid var(--hkm-divider);
-        padding-top: 14px;
-      }
-      summary {
+      .toggle-row {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
         cursor: pointer;
+      }
+      .toggle-icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: var(--hkm-surface-3);
+      }
+      .toggle-icon svg {
+        width: 18px;
+        height: 18px;
+        fill: var(--hkm-text-2);
+      }
+      .toggle-text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .toggle-title {
         font-weight: 600;
         font-size: 15px;
-        list-style: none;
-        margin-bottom: 12px;
       }
-      details:not([open]) summary {
-        margin-bottom: 0;
+      .toggle-sub {
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        line-height: 1.4;
       }
       .helper {
         font-size: 12px;
         color: var(--hkm-text-2);
-      }
-      summary::-webkit-details-marker {
-        display: none;
-      }
-      summary svg {
-        width: 18px;
-        height: 18px;
-        fill: var(--hkm-text-2);
       }
       .checks {
         display: flex;
