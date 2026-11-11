@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 from pathlib import Path
 
@@ -63,6 +64,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     mtime = await hass.async_add_executor_job(lambda: int(panel_file.stat().st_mtime))
     module_url = f"{STATIC_URL}/{PANEL_FILENAME}?v={integration.version}-{mtime}"
 
+    panel_kwargs: dict = {}
+    if (
+        "handle_safe_area"
+        in inspect.signature(panel_custom.async_register_panel).parameters
+    ):
+        # The panel pads itself for the status bar / home indicator of the
+        # companion apps (otherwise HA adds a plain padding around it).
+        panel_kwargs["handle_safe_area"] = True
     await panel_custom.async_register_panel(
         hass,
         frontend_url_path=PANEL_URL_PATH,
@@ -73,6 +82,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         embed_iframe=False,
         require_admin=True,
         config={"version": str(integration.version)},
+        **panel_kwargs,
     )
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
     return True
