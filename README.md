@@ -9,13 +9,15 @@ Home-Assistant-Integration für den Marketplace (früher HACS): legt HomeKit Bri
 | Entitäten zuweisen | Einzelgeräte (TV, Kamera, Schloss) |
 |---|---|
 | ![Zuweisen](docs/images/assign.png) | ![Einzelgeräte](docs/images/accessories.png) |
-| ![Entität bearbeiten](docs/images/entity-dialog.png) | ![Hinzufügen](docs/images/add.png) |
+| ![Automatisch zuweisen](docs/images/rules.png) | ![Geräteoptionen](docs/images/entity-dialog.png) |
 
 ## Funktionen
 
 - **Bridge anlegen** beim Einrichten der Integration oder jederzeit im Panel; mehrere Bridges möglich.
 - **Entitäten per Schalter zuweisen**, gruppiert nach Bereich oder Typ, mit Suche, Filtern und „Alle hinzufügen“ pro Gruppe. Änderungen werden gesammelt und mit einem Klick übernommen.
-- **Name in HomeKit** und **Gerätetyp** pro Entität (z. B. Schalter → Steckdose/Ventil/Bewässerung, Ventilator → Luftreiniger, Klima → Thermostat/Heiz-/Kühlgerät).
+- **Automatisch zuweisen** per Label, Etage, Bereich und Typ: Neue passende Entitäten landen von selbst in der Bridge, von Hand entfernte bleiben ausgeschlossen.
+- **Geräteoptionen** pro Entität: Name in HomeKit, Gerätetyp (z. B. Schalter → Steckdose/Ventil/Bewässerung, Ventilator → Luftreiniger, Klima → Thermostat/Heiz-/Kühlgerät), **verknüpfte Sensoren** (Batterie, Bewegung/Klingel an Kameras, Klingel an Schlössern, Luftfeuchte, Feinstaub, Filter, Hinderniserkennung), **Code** für Alarmanlage und Schloss, **Mediaplayer-Funktionen**.
+- **Wartungsfrei:** Umbenannte Entitäts-IDs werden automatisch nachgezogen (das Gerät bleibt in Apple Home erhalten). Gelöschte Entitäten zeigt das Panel an und Home Assistant meldet sie unter *Reparaturen* mit Ein-Klick-Bereinigung.
 - **Einzelgeräte** für Fernseher, Receiver, Projektoren, Kameras, Schlösser und Aktivitäts-Fernbedienungen – Apple Home unterstützt diese nur so vollständig. Beim Anlegen wird das Gerät auf Wunsch aus der Bridge entfernt.
 - **Koppeln**: QR-Code und Setup-Code direkt im Panel, Kopplungsstatus live, Kopplung zurücksetzen, Neustart, Umbenennen, Port ändern, Löschen.
 - **Bestehende Bridges übernehmen**, die mit dem HomeKit-Standarddialog (Domain-Filter) angelegt wurden.

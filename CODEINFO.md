@@ -14,6 +14,11 @@ custom_components/homekit_manager/   Integration (wird so installiert)
   manifest.json        Integrations-Manifest (version = Release-Tag)
   config_flow.py       Einrichtung (erste Bridge) + Optionen (Titel/Icon der Seitenleiste)
   bridge.py            BridgeManager: alle Operationen auf Core-HomeKit-Entries
+  entity_options.py    Validierung/Patch der Geräteoptionen (entity_config): Name, Typ,
+                       verknüpfte Sensoren, Code, Mediaplayer-Funktionen, Akku-Schwelle
+  rules.py             Regeln (Label/Etage/Bereich/Typ), Store .storage/homekit_manager.rules
+  sync.py              EntitySync: Registry-Listener für Umbenennungen, Repair-Issues, Regeln
+  repairs.py           Fix-Flow „gelöschte Entitäten entfernen“
   accessory_types.py   Vorhersage des HomeKit-Gerätetyps (Spiegel von core get_accessory)
   websocket_api.py     Websocket-Befehle homekit_manager/*
   compat.py            probatio/voluptuous-Kompatibilität (HA ≥ 2026.11 vs. älter)
@@ -23,8 +28,11 @@ custom_components/homekit_manager/   Integration (wird so installiert)
   frontend/            gebautes Panel-Bundle homekit-manager-panel.js (eingecheckt)
 frontend/              Quellcode des Panels
   src/panel.ts         Hauptkomponente <homekit-manager-panel>: Zustand, Layout, Aktionen
-  src/dialogs.ts       Dialoge: Entität, Bridge anlegen/Einstellungen, Bestätigung,
+  src/dialogs.ts       Dialog-Basis + Bridge anlegen/Einstellungen, Bestätigung,
                        Auswahl Bridge/Einzelgerät, Einzelgerät-Auswahl
+  src/entity-dialog.ts Geräteoptionen einer Entität (Bridge-Entwurf oder Einzelgerät direkt)
+  src/rules-dialog.ts  Regel-Dialog „Automatisch zuweisen“ mit Live-Vorschau
+  src/options.ts       Entwurfs-/Diff-Logik für Geräteoptionen
   src/api.ts           Typen + Websocket-Aufrufe
   src/meta.ts          Kategorien, Icons, Beschriftung der HomeKit-Typen
   src/i18n.ts          Texte de/en
@@ -47,8 +55,10 @@ docs/images/           Screenshots für README
   - `async_describe` / `async_list` / `async_entities`: JSON für das Panel.
   - Pro Entry ein `asyncio.Lock`; nach jeder Änderung `async_wait_started()` bis die neu geladene HomeKit-Instanz läuft (verhindert Port-Konflikte durch überlappende Reloads).
 - **Filter-Konvention**: Eine Bridge gilt als „verwaltet“, wenn ihr Filter nur `include_entities` enthält. Leere Auswahl = `exclude_entity_globs: ["*"]` (ein komplett leerer Filter würde in Core *alle* Entitäten freigeben).
+- **`entity_options.py`**: `apply_patch()`/`validate_option()` für alle verwalteten `entity_config`-Schlüssel; verknüpfte Sensoren werden gegen die in Core vorhandenen `CONF_LINKED_*` gefiltert. `public_options()` ersetzt den Code durch `has_code` – der Code verlässt den Server nie.
+- **`rules.py` / `sync.py`**: Regel = Labels ∪ Etagen ∪ Bereiche, optional eingeschränkt auf Typen (Domains). `members` = von der Regel hinzugefügt, `exclude` = vom Nutzer trotz Treffer entfernt. `EntitySync` hört auf Entity-/Device-/Area-/Label-/Floor-Registry und neue States; Umbenennungen (`old_entity_id`) sofort, Regel-Sync und Repair-Prüfung entprellt und erst nach einer Startphase (120 s), damit spät ladende Integrationen nicht als gelöscht gelten.
 - **`accessory_types.py`**: `resolve_accessory_type()` spiegelt die Typentscheidung von `homekit.accessories.get_accessory`; Ergebnis wird gegen die in Core registrierten Typen geprüft. `entity_type_options()` liest `SWITCH_TYPES`/`FAN_TYPES`/`CLIMATE_TYPES` aus Core.
-- **`websocket_api.py`**: Befehle `bridges`, `entities`, `pairing`, `bridge/create|settings|assign|adopt|restart|unpair|delete`, `accessory/create`; alle `require_admin`. `BridgeError.code` wird als Fehlercode ans Panel gegeben.
+- **`websocket_api.py`**: Befehle `bridges`, `entities`, `pairing`, `bridge/create|settings|assign|adopt|restart|unpair|delete|remove_missing`, `accessory/create`, `entity/options`, `rules/set|preview`; alle `require_admin`. `BridgeError.code` wird als Fehlercode ans Panel gegeben.
 - **Panel (`panel.ts`)**: lädt Bridges + Entitäten, hält Änderungen als Entwurf (`_draft`, `_draftConfig`) bis „Übernehmen“, pollt alle 5 s den Bridge-Status (Kopplung, PIN-Wechsel nach Neustart), drosselt `hass`-Updates auf 1/s. Nutzt `ha-menu-button`, `ha-state-icon` (mit Fallback) und HA-Events `hass-notification`/`hass-more-info`.
 
 ## Zusammenspiel / Datenfluss

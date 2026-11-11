@@ -136,16 +136,8 @@ async def ws_create_accessory(hass, connection, msg, manager: BridgeManager) -> 
     connection.send_result(msg["id"], {"bridge": bridge})
 
 
-_ENTITY_CONFIG_SCHEMA = vol.Schema(
-    {
-        str: vol.Schema(
-            {
-                vol.Optional("name"): vol.Any(None, str),
-                vol.Optional("type"): vol.Any(None, str),
-            }
-        )
-    }
-)
+# Values are validated by entity_options.validate_option
+_ENTITY_CONFIG_SCHEMA = vol.Schema({str: vol.Schema({str: object})})
 
 
 @websocket_api.websocket_command(
@@ -167,6 +159,71 @@ async def ws_assign(hass, connection, msg, manager: BridgeManager) -> None:
     connection.send_result(msg["id"], {"bridge": bridge})
 
 
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): PREFIX + "entity/options",
+        vol.Required("entry_id"): str,
+        vol.Required("entity_id"): str,
+        vol.Required("options"): vol.Schema({str: object}),
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_entity_options(hass, connection, msg, manager: BridgeManager) -> None:
+    """Change the HomeKit options of one entity (also for accessories)."""
+    bridge = await manager.async_set_entity_options(
+        msg["entry_id"], msg["entity_id"], msg["options"]
+    )
+    connection.send_result(msg["id"], {"bridge": bridge})
+
+
+_RULE_FIELDS = {
+    vol.Optional("enabled"): bool,
+    vol.Optional("labels"): [str],
+    vol.Optional("areas"): [str],
+    vol.Optional("floors"): [str],
+    vol.Optional("domains"): [str],
+}
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): PREFIX + "rules/set",
+        vol.Required("entry_id"): str,
+        vol.Optional("reset_exclusions", default=False): bool,
+        **_RULE_FIELDS,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_rules_set(hass, connection, msg, manager: BridgeManager) -> None:
+    """Store and apply the automatic assignment rule of a bridge."""
+    data = {k: v for k, v in msg.items() if k not in ("id", "type", "entry_id")}
+    bridge = await manager.async_set_rule(msg["entry_id"], data)
+    connection.send_result(msg["id"], {"bridge": bridge})
+
+
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): PREFIX + "rules/preview",
+        vol.Required("entry_id"): str,
+        **_RULE_FIELDS,
+    }
+)
+@websocket_api.require_admin
+@websocket_api.async_response
+@_with_manager
+async def ws_rules_preview(hass, connection, msg, manager: BridgeManager) -> None:
+    """Entities a rule would add."""
+    data = {k: v for k, v in msg.items() if k not in ("id", "type", "entry_id")}
+    data["enabled"] = True
+    connection.send_result(
+        msg["id"], {"entities": manager.async_preview_rule(msg["entry_id"], data)}
+    )
+
+
 def _simple_bridge_command(command: str, method: str) -> Callable:
     @websocket_api.websocket_command(
         {vol.Required("type"): PREFIX + command, vol.Required("entry_id"): str}
@@ -186,6 +243,9 @@ ws_adopt = _simple_bridge_command("bridge/adopt", "async_adopt")
 ws_restart = _simple_bridge_command("bridge/restart", "async_restart")
 ws_unpair = _simple_bridge_command("bridge/unpair", "async_unpair")
 ws_delete = _simple_bridge_command("bridge/delete", "async_delete")
+ws_remove_missing = _simple_bridge_command(
+    "bridge/remove_missing", "async_remove_missing"
+)
 
 
 @callback
@@ -203,5 +263,9 @@ def async_register(hass: HomeAssistant) -> None:
         ws_restart,
         ws_unpair,
         ws_delete,
+        ws_remove_missing,
+        ws_entity_options,
+        ws_rules_set,
+        ws_rules_preview,
     ):
         websocket_api.async_register_command(hass, handler)

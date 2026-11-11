@@ -218,3 +218,34 @@ export const typeFromOption = (domain: string, option: string | null | undefined
   if (domain === "climate") return option === "heater_cooler" ? "HeaterCooler" : "Thermostat";
   return null;
 };
+
+const LINK_LABELS: Record<string, Labels> = {
+  linked_battery_sensor: { de: "Batteriesensor", en: "Battery sensor" },
+  linked_battery_charging_sensor: { de: "Ladezustand (lädt)", en: "Battery charging" },
+  linked_motion_sensor: { de: "Bewegungsmelder", en: "Motion sensor" },
+  linked_doorbell_sensor: { de: "Türklingel", en: "Doorbell" },
+  linked_humidity_sensor: { de: "Luftfeuchtigkeit", en: "Humidity sensor" },
+  linked_pm25_sensor: { de: "Feinstaub (PM2.5)", en: "PM2.5 sensor" },
+  linked_temperature_sensor: { de: "Temperatur", en: "Temperature sensor" },
+  linked_filter_change_indication_binary_sensor: {
+    de: "Filterwechsel nötig",
+    en: "Filter change indicator",
+  },
+  linked_filter_life_level_sensor: { de: "Filter-Restlaufzeit", en: "Filter life level" },
+  linked_obstruction_sensor: { de: "Hinderniserkennung", en: "Obstruction sensor" },
+};
+
+const MEDIA_FEATURE_LABELS: Record<string, Labels> = {
+  on_off: { de: "Ein/Aus", en: "On/off" },
+  play_pause: { de: "Wiedergabe/Pause", en: "Play/pause" },
+  play_stop: { de: "Wiedergabe/Stopp", en: "Play/stop" },
+  toggle_mute: { de: "Stummschalten", en: "Mute" },
+};
+
+export const linkLabel = (key: string, german: boolean) => pick(LINK_LABELS[key], german, key);
+
+export const mediaFeatureLabel = (key: string, german: boolean) =>
+  pick(MEDIA_FEATURE_LABELS[key], german, key);
+
+export const isBatteryLink = (key: string) =>
+  key === "linked_battery_sensor" || key === "linked_battery_charging_sensor";

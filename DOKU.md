@@ -17,11 +17,15 @@ Keine Umgebungsvariablen, keine Secrets.
 | Ort | Inhalt |
 |---|---|
 | Integration HomeKit Manager → *Konfigurieren* | Titel und Icon der Seitenleiste |
-| Panel *HomeKit* | Bridges/Einzelgeräte anlegen, umbenennen, Port, Entitäten, Name/Typ in HomeKit |
+| Panel *HomeKit* | Bridges/Einzelgeräte anlegen, umbenennen, Port, Entitäten, Regeln, Geräteoptionen |
 | `.storage/core.config_entries` | Die eigentlichen Daten liegen in den `homekit`-Config-Entries (Optionen `filter`, `entity_config`, `mode`) |
 | `.storage/homekit.<entry_id>.*` | Kopplungszustand/Accessory-IDs (verwaltet von Core) |
+| `.storage/homekit_manager.rules` | Regeln „Automatisch zuweisen“ je Bridge (inkl. Ausschlüsse) |
 
 Hinweise:
+- **Codes** für Alarmanlage/Schloss stehen – wie bei der YAML-Konfiguration von HomeKit – im Klartext in `.storage/core.config_entries`. Das Panel zeigt gespeicherte Codes nie an, sie werden nur gesetzt oder gelöscht. Backups entsprechend schützen.
+- **Automatisch zuweisen:** Treffer = Label ODER Etage ODER Bereich, optional nur bestimmte Typen. Versteckte/Diagnose-Entitäten zählen nur über ein Label. Von Hand entfernte Treffer bleiben ausgeschlossen (im Regel-Dialog zurücksetzbar). Entitäten, die nicht mehr passen, werden nur entfernt, wenn die Regel sie hinzugefügt hat. Synchronisiert wird 15 s nach einer Änderung in Home Assistant, frühestens 2 min nach dem Start.
+- **Umbenennungen** von Entitäts-IDs werden sofort in alle Bridges/Einzelgeräte übernommen (inkl. verknüpfter Sensoren); das Gerät behält in Apple Home Raum und Szenen.
 - Bridge-Namen werden mDNS-tauglich gemacht (A–Z, Ziffern, Leerzeichen; ä→ae usw., 3–25 Zeichen).
 - Max. 149 Geräte pro Bridge (HomeKit-Limit 150 inkl. Bridge).
 - Per YAML (`homekit:` in `configuration.yaml`) definierte Bridges werden nur angezeigt, nicht verändert.
@@ -68,5 +72,8 @@ ruff check custom_components tests script
 | Entität erscheint nicht in Apple Home | Badge „nicht unterstützt“ im Panel | HomeKit kennt keinen passenden Typ (z. B. Leistungssensoren). Für Sensoren: Device-Class Temperatur/Feuchte/Luftqualität/CO/CO₂/Helligkeit. |
 | Fernseher/Kamera nur als Schalter oder ohne Bild | in Bridge statt Einzelgerät | Im Panel *Als Einzelgerät koppeln*, dann neuen Setup-Code in der Home-App scannen. |
 | Bridge zeigt „Diese Bridge nutzt Domain-Filter“ | angelegt/geändert über den Core-Dialog | *Bridge übernehmen*. |
+| Reparatur „HomeKit … enthält gelöschte Entitäten“ | Entität wurde in HA gelöscht | *Reparieren* → *Absenden* entfernt sie (ein Einzelgerät ohne Entität wird gelöscht). |
+| Regel fügt nichts hinzu | Vorschau im Regel-Dialog prüfen | Label an Entität **oder** Gerät setzen; Bereich/Etage zuordnen; Typ-Filter prüfen; Entität evtl. als Einzelgerät gekoppelt. |
+| Icon im Marketplace fehlt direkt nach der Installation | Browser hat den Platzhalter von vor der Installation gecacht | Seite neu laden (Strg+F5). Vor der Installation zeigt der Marketplace Icons nur für Katalog-Integrationen mit Release. |
 | Panel zeigt „Fehler: unauthorized“ | Benutzer ist kein Admin | Panel und API sind nur für Administratoren. |
 | Nach Update alte Panel-Version | Browser-Cache | Seite neu laden (Strg+F5); URL enthält Version + Datei-Zeitstempel. |

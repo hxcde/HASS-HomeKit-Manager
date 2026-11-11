@@ -35,6 +35,7 @@ from homeassistant.helpers import (
     config_validation as cv,
     device_registry as dr,
     entity_registry as er,
+    issue_registry as ir,
 )
 from homeassistant.helpers.entityfilter import FILTER_SCHEMA, EntityFilter
 
@@ -46,7 +47,7 @@ from .accessory_types import (
 )
 from .const import (
     BRIDGE_START_TIMEOUT,
-    EC_NAME,
+    DOMAIN,
     EC_TYPE,
     EXCLUDE_ALL_GLOB,
     HK_CONF_ENTITY_CONFIG,
@@ -56,9 +57,16 @@ from .const import (
     HK_MODE_ACCESSORY,
     HK_MODE_BRIDGE,
     HOMEKIT_DOMAIN,
-    MANAGED_ENTITY_CONFIG_KEYS,
     MAX_BRIDGED_ACCESSORIES,
 )
+from .entity_options import (
+    EntityOptionError,
+    apply_patch,
+    available_link_fields,
+    media_player_features,
+    public_options,
+)
+from .rules import Rule, RulesStore, evaluate_rule
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -87,7 +95,6 @@ _TRANSLITERATION = str.maketrans(
 
 NAME_MIN_LENGTH = 3
 NAME_MAX_LENGTH = 25
-ENTITY_NAME_MAX_LENGTH = 64
 PORT_MIN = 1024
 PORT_MAX = 65535
 
@@ -266,6 +273,31 @@ def _format_pin(pin: str) -> str:
     return pin
 
 
+def _labels(hass: HomeAssistant) -> dict[str, dict[str, Any]]:
+    try:
+        from homeassistant.helpers import label_registry as lr  # noqa: PLC0415
+    except ImportError:  # pragma: no cover
+        return {}
+    return {
+        label.label_id: {"name": label.name, "color": label.color, "icon": label.icon}
+        for label in sorted(
+            lr.async_get(hass).async_list_labels(), key=lambda x: x.name
+        )
+    }
+
+
+def _floors(hass: HomeAssistant) -> dict[str, str]:
+    try:
+        from homeassistant.helpers import floor_registry as fr  # noqa: PLC0415
+    except ImportError:  # pragma: no cover
+        return {}
+    floors = sorted(
+        fr.async_get(hass).async_list_floors(),
+        key=lambda x: (x.level if x.level is not None else 0, x.name),
+    )
+    return {floor.floor_id: floor.name for floor in floors}
+
+
 # --------------------------------------------------------------------------
 # Manager
 # --------------------------------------------------------------------------
@@ -274,9 +306,12 @@ def _format_pin(pin: str) -> str:
 class BridgeManager:
     """High level operations on HomeKit bridges."""
 
-    def __init__(self, hass: HomeAssistant) -> None:
+    def __init__(self, hass: HomeAssistant, rules: RulesStore | None = None) -> None:
         """Initialize the manager."""
         self.hass = hass
+        self.rules = rules
+        # Repair issues are only raised once all integrations had time to load
+        self.issues_enabled = False
         self._locks: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._create_lock = asyncio.Lock()
 
@@ -318,6 +353,12 @@ class BridgeManager:
         explicit = is_explicit_filter(entity_filter)
         entity_config = entry.options.get(HK_CONF_ENTITY_CONFIG) or {}
         accessories = _accessory_entity_ids(homekit)
+        deleted, unavailable = self.async_entity_health(entry) if explicit else ([], [])
+        rule = (
+            self.rules.get(entry.entry_id)
+            if self.rules is not None and self.rules.has(entry.entry_id)
+            else None
+        )
         return {
             "entry_id": entry.entry_id,
             "title": entry.title,
@@ -343,14 +384,13 @@ class BridgeManager:
             if accessories is not None
             else None,
             "entity_config": {
-                entity_id: {
-                    key: value
-                    for key, value in conf.items()
-                    if key in MANAGED_ENTITY_CONFIG_KEYS
-                }
+                entity_id: public_options(conf)
                 for entity_id, conf in entity_config.items()
                 if isinstance(conf, dict)
             },
+            "missing": deleted,
+            "unavailable": unavailable,
+            "rule": rule.as_dict() if rule else None,
             "filter": None if explicit else entity_filter,
             "exclude_accessory_mode": bool(
                 entry.data.get(HK_CONF_EXCLUDE_ACCESSORY_MODE, False)
@@ -406,8 +446,22 @@ class BridgeManager:
                     (entry.entry_id, self._implicit_member_check(compiled))
                 )
 
+        link_fields = available_link_fields()
+        link_domains = {d for f in link_fields.values() for d in f.domains}
         entities: list[dict[str, Any]] = []
+        candidates: list[dict[str, Any]] = []
         for state in hass.states.async_all():
+            if state.domain in link_domains:
+                reg = ent_reg.async_get(state.entity_id)
+                candidates.append(
+                    {
+                        "entity_id": state.entity_id,
+                        "name": state.name,
+                        "domain": state.domain,
+                        "device_class": state.attributes.get("device_class"),
+                        "device_id": reg.device_id if reg else None,
+                    }
+                )
             if state.domain not in SUPPORTED_DOMAINS:
                 continue
             entities.append(
@@ -415,13 +469,17 @@ class BridgeManager:
             )
 
         entities.sort(key=lambda item: (item["name"] or item["entity_id"]).lower())
+        candidates.sort(key=lambda item: (item["name"] or item["entity_id"]).lower())
+        areas = sorted(area_reg.async_list_areas(), key=lambda a: a.name)
         return {
             "entities": entities,
-            "areas": {
-                area.id: area.name
-                for area in sorted(area_reg.async_list_areas(), key=lambda a: a.name)
-            },
+            "areas": {area.id: area.name for area in areas},
+            "area_floors": {area.id: area.floor_id for area in areas if area.floor_id},
+            "floors": _floors(hass),
+            "labels": _labels(hass),
             "type_options": {k: list(v) for k, v in entity_type_options().items()},
+            "link_fields": {k: f.as_dict() for k, f in link_fields.items()},
+            "link_candidates": candidates,
             "max_accessories": MAX_BRIDGED_ACCESSORIES,
         }
 
@@ -453,8 +511,15 @@ class BridgeManager:
         area_id = (reg.area_id if reg else None) or (device.area_id if device else None)
         area = area_reg.async_get_area(area_id) if area_id else None
         accessory_type = resolve_accessory_type(state, None)
+        labels = set(reg.labels if reg else ()) | set(device.labels if device else ())
         return {
             "entity_id": entity_id,
+            "device_id": device.id if device else None,
+            "labels": sorted(labels),
+            "floor_id": area.floor_id if area else None,
+            "media_features": (
+                media_player_features(state) if state.domain == "media_player" else None
+            ),
             "name": state.name,
             "domain": state.domain,
             "device_class": state.attributes.get("device_class"),
@@ -748,11 +813,56 @@ class BridgeManager:
                 )
         return self.async_describe(entry)
 
+    def _patched_entity_config(
+        self,
+        entry: ConfigEntry,
+        patches: dict[str, dict[str, Any]] | None,
+        exposed: set[str],
+    ) -> tuple[dict[str, dict[str, Any]], list[str]]:
+        """Apply option patches; return new entity_config and type changes."""
+        current = set(_filter_dict(entry)["include_entities"])
+        new_config: dict[str, dict[str, Any]] = deepcopy(
+            dict(entry.options.get(HK_CONF_ENTITY_CONFIG) or {})
+        )
+        type_changed: list[str] = []
+        for raw_entity_id, patch in (patches or {}).items():
+            entity_id = cv.entity_id(raw_entity_id)
+            conf = dict(new_config.get(entity_id) or {})
+            old_type = conf.get(EC_TYPE)
+            try:
+                conf = apply_patch(conf, entity_id, patch)
+            except EntityOptionError as err:
+                raise BridgeError(err.code, str(err)) from err
+            # Accessories that already exist in Apple Home must be reset
+            # when their type changes; new ones are created fresh anyway.
+            if conf.get(EC_TYPE) != old_type and entity_id in exposed & current:
+                type_changed.append(entity_id)
+            if conf:
+                new_config[entity_id] = conf
+            else:
+                new_config.pop(entity_id, None)
+        return new_config, type_changed
+
+    async def _async_apply_options(
+        self, entry: ConfigEntry, options: dict[str, Any], type_changed: list[str]
+    ) -> None:
+        changed = await self._async_apply(entry, options=options)
+        if changed and type_changed:
+            # A reset takes ~10 s in core; do not block the UI on it.
+            self.hass.async_create_task(
+                self._async_reset_accessories(type_changed),
+                f"homekit_manager reset {entry.entry_id}",
+            )
+        if changed:
+            self.async_update_issues()
+
     async def async_set_entities(
         self,
         entry_id: str,
         entity_ids: list[str],
         entity_config: dict[str, dict[str, Any]] | None = None,
+        *,
+        by_user: bool = True,
     ) -> dict[str, Any]:
         """Replace the entity list of a bridge and patch per-entity options."""
         entry = self._get_bridge(entry_id)
@@ -765,67 +875,244 @@ class BridgeManager:
             )
 
         async with self._locks[entry_id]:
+            new_config, type_changed = self._patched_entity_config(
+                entry, entity_config, set(ids)
+            )
             options = deepcopy(dict(entry.options))
             options[HK_CONF_FILTER] = build_filter(ids)
-            new_config: dict[str, dict[str, Any]] = deepcopy(
-                dict(options.get(HK_CONF_ENTITY_CONFIG) or {})
-            )
-            type_changed: list[str] = []
-            for raw_entity_id, patch in (entity_config or {}).items():
-                entity_id = cv.entity_id(raw_entity_id)
-                conf = dict(new_config.get(entity_id) or {})
-                old_type = conf.get(EC_TYPE)
-                for key in MANAGED_ENTITY_CONFIG_KEYS:
-                    if key not in patch:
-                        continue
-                    if (
-                        value := self._validate_entity_option(
-                            entity_id, key, patch[key]
-                        )
-                    ) is None:
-                        conf.pop(key, None)
-                    else:
-                        conf[key] = value
-                # Accessories that already exist in Apple Home must be reset
-                # when their type changes; new ones are created fresh anyway.
-                if (
-                    conf.get(EC_TYPE) != old_type
-                    and entity_id in ids
-                    and entity_id in current
-                ):
-                    type_changed.append(entity_id)
-                if conf:
-                    new_config[entity_id] = conf
-                else:
-                    new_config.pop(entity_id, None)
             options[HK_CONF_ENTITY_CONFIG] = new_config
-
-            changed = await self._async_apply(entry, options=options)
-            if changed and type_changed:
-                # A reset takes ~10 s in core; do not block the UI on it.
-                self.hass.async_create_task(
-                    self._async_reset_accessories(type_changed),
-                    f"homekit_manager reset {entry.entry_id}",
-                )
+            if by_user:
+                self._async_track_manual_changes(entry_id, current, set(ids))
+            await self._async_apply_options(entry, options, type_changed)
         return self.async_describe(entry)
 
-    @staticmethod
-    def _validate_entity_option(entity_id: str, key: str, value: Any) -> Any:
-        if value is None or (isinstance(value, str) and not value.strip()):
-            return None
-        if key == EC_NAME:
-            value = " ".join(str(value).split())
-            if len(value) > ENTITY_NAME_MAX_LENGTH:
-                raise BridgeError("invalid_name", f"Name for {entity_id} is too long")
-            return value
-        if key == EC_TYPE:
-            domain = entity_id.split(".", 1)[0]
-            if value not in entity_type_options().get(domain, ()):
-                raise BridgeError(
-                    "invalid_type", f"Type {value} not valid for {entity_id}"
+    async def async_set_entity_options(
+        self, entry_id: str, entity_id: str, patch: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Change the HomeKit options of one entity (bridge or accessory)."""
+        entry = self._get_editable(entry_id)
+        entity_id = cv.entity_id(entity_id)
+        if entity_id not in _filter_dict(entry)["include_entities"]:
+            raise BridgeError("not_exposed", f"{entity_id} is not exposed here")
+        async with self._locks[entry_id]:
+            new_config, type_changed = self._patched_entity_config(
+                entry, {entity_id: patch}, {entity_id}
+            )
+            options = deepcopy(dict(entry.options))
+            options[HK_CONF_ENTITY_CONFIG] = new_config
+            await self._async_apply_options(entry, options, type_changed)
+        return self.async_describe(entry)
+
+    # ------------------------------------------------------------ maintenance
+
+    async def async_rename_entity(self, old: str, new: str) -> None:
+        """Follow an entity id rename in all HomeKit instances.
+
+        Core HomeKit keeps the old id in its filter, which silently drops the
+        accessory from Apple Home. The accessory id is bound to the unique id,
+        so the device keeps its room and scenes in the Home app.
+        """
+        if self.rules is not None:
+            self.rules.rename_entity(old, new)
+        for entry in homekit_entries(self.hass):
+            if entry.source == SOURCE_IMPORT:
+                continue
+            async with self._locks[entry.entry_id]:
+                options = deepcopy(dict(entry.options))
+                entity_filter = _filter_dict(entry)
+                changed = False
+                for key in ("include_entities", "exclude_entities"):
+                    if old in entity_filter[key]:
+                        entity_filter[key] = sorted(
+                            {new if e == old else e for e in entity_filter[key]}
+                        )
+                        changed = True
+                entity_config = options.get(HK_CONF_ENTITY_CONFIG) or {}
+                if old in entity_config:
+                    entity_config[new] = entity_config.pop(old)
+                    changed = True
+                for conf in entity_config.values():
+                    if not isinstance(conf, dict):
+                        continue
+                    for key, value in list(conf.items()):
+                        if key.startswith("linked_") and value == old:
+                            conf[key] = new
+                            changed = True
+                if not changed:
+                    continue
+                options[HK_CONF_FILTER] = entity_filter
+                options[HK_CONF_ENTITY_CONFIG] = entity_config
+                _LOGGER.info(
+                    "Entity %s was renamed to %s, updating HomeKit %s",
+                    old,
+                    new,
+                    entry.title,
                 )
-            return value
-        return None  # pragma: no cover
+                await self._async_apply(entry, options=options)
+
+    @callback
+    def async_entity_health(self, entry: ConfigEntry) -> tuple[list[str], list[str]]:
+        """Return (deleted, unavailable) entities exposed by an instance."""
+        ent_reg = er.async_get(self.hass)
+        deleted: list[str] = []
+        unavailable: list[str] = []
+        for entity_id in _filter_dict(entry)["include_entities"]:
+            state = self.hass.states.get(entity_id)
+            reg = ent_reg.async_get(entity_id)
+            if state is None and reg is None:
+                deleted.append(entity_id)
+            elif (
+                state is None
+                or state.state == "unavailable"
+                or (reg is not None and reg.disabled_by is not None)
+            ):
+                unavailable.append(entity_id)
+        return sorted(deleted), sorted(unavailable)
+
+    async def async_remove_missing(self, entry_id: str) -> dict[str, Any]:
+        """Remove deleted entities from a bridge or delete an orphaned accessory."""
+        entry = self._get_editable(entry_id)
+        deleted, _ = self.async_entity_health(entry)
+        if not deleted:
+            return self.async_describe(entry)
+        if _entry_mode(entry) == HK_MODE_ACCESSORY:
+            await self.async_delete(entry_id)
+            self.async_update_issues()
+            return {}
+        remaining = [
+            e for e in _filter_dict(entry)["include_entities"] if e not in deleted
+        ]
+        return await self.async_set_entities(entry_id, remaining, by_user=False)
+
+    @callback
+    def async_update_issues(self) -> None:
+        """Create or clear repair issues for deleted entities."""
+        if not self.issues_enabled:
+            return
+        for entry in homekit_entries(self.hass):
+            issue_id = f"missing_entities_{entry.entry_id}"
+            deleted = (
+                self.async_entity_health(entry)[0]
+                if entry.source != SOURCE_IMPORT
+                and is_explicit_filter(_filter_dict(entry))
+                else []
+            )
+            if deleted:
+                ir.async_create_issue(
+                    self.hass,
+                    DOMAIN,
+                    issue_id,
+                    is_fixable=True,
+                    is_persistent=False,
+                    severity=ir.IssueSeverity.WARNING,
+                    translation_key="missing_entities",
+                    translation_placeholders={
+                        "name": entry.data.get(CONF_NAME, entry.title),
+                        "entities": "\n".join(f"- {e}" for e in deleted),
+                    },
+                    data={"entry_id": entry.entry_id},
+                )
+            else:
+                ir.async_delete_issue(self.hass, DOMAIN, issue_id)
+
+    # ------------------------------------------------------------------ rules
+
+    def _taken_by_accessories(self) -> set[str]:
+        return self._accessory_mode_entities()
+
+    @callback
+    def _async_track_manual_changes(
+        self, entry_id: str, before: set[str], after: set[str]
+    ) -> None:
+        """Remember manual removals of rule matches as exclusions."""
+        if self.rules is None or not self.rules.has(entry_id):
+            return
+        rule = self.rules.get(entry_id)
+        matches = evaluate_rule(self.hass, rule, self._taken_by_accessories())
+        exclude = (set(rule.exclude) | ((before - after) & matches)) - after
+        rule.exclude = sorted(exclude)
+        rule.members = sorted(
+            (set(rule.members) & after) | ((matches - exclude) & after)
+        )
+        self.rules.set(entry_id, rule)
+
+    def _rule_from_input(self, entry_id: str, data: dict[str, Any]) -> Rule:
+        rule = Rule.from_dict(
+            {**(self.rules.get(entry_id).as_dict() if self.rules else {}), **data}
+        )
+        rule.domains = [d for d in rule.domains if d in SUPPORTED_DOMAINS]
+        return rule
+
+    @callback
+    def async_preview_rule(self, entry_id: str, data: dict[str, Any]) -> list[str]:
+        """Entities a rule would add (excluding manual exclusions)."""
+        self._get_bridge(entry_id)
+        rule = self._rule_from_input(entry_id, data)
+        matches = evaluate_rule(self.hass, rule, self._taken_by_accessories())
+        return sorted(matches - set(rule.exclude))
+
+    async def async_set_rule(
+        self, entry_id: str, data: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Store the rule of a bridge and apply it right away."""
+        if self.rules is None:
+            raise BridgeError("not_loaded", "Rules are not available")
+        entry = self._get_bridge(entry_id)
+        rule = self._rule_from_input(entry_id, data)
+        if data.get("reset_exclusions"):
+            rule.exclude = []
+        self.rules.set(entry_id, rule)
+        await self.async_sync_rules([entry_id])
+        return self.async_describe(entry)
+
+    async def async_sync_rules(self, entry_ids: list[str] | None = None) -> None:
+        """Bring bridges with an active rule in line with their rule."""
+        if self.rules is None:
+            return
+        taken = self._taken_by_accessories()
+        for entry_id, rule in list(self.rules.active().items()):
+            if entry_ids is not None and entry_id not in entry_ids:
+                continue
+            entry = self.hass.config_entries.async_get_entry(entry_id)
+            if (
+                entry is None
+                or entry.source == SOURCE_IMPORT
+                or _entry_mode(entry) != HK_MODE_BRIDGE
+                or not is_explicit_filter(_filter_dict(entry))
+            ):
+                continue
+            matches = evaluate_rule(self.hass, rule, taken) - set(rule.exclude)
+            current = set(_filter_dict(entry)["include_entities"])
+            # Entities without a state (integration still loading) keep their
+            # place; only drop them when they demonstrably stopped matching.
+            ent_reg = er.async_get(self.hass)
+            stale = {
+                entity_id
+                for entity_id in set(rule.members) - matches
+                if self.hass.states.get(entity_id) is not None
+                or ent_reg.async_get(entity_id) is None
+            }
+            wanted = (current - stale) | matches
+            if len(wanted) > MAX_BRIDGED_ACCESSORIES:
+                _LOGGER.warning(
+                    "Rule of HomeKit bridge %s matches too many entities, "
+                    "only %s are exposed",
+                    entry.title,
+                    MAX_BRIDGED_ACCESSORIES,
+                )
+                extra = sorted(wanted - current)
+                room = max(0, MAX_BRIDGED_ACCESSORIES - len(current - stale))
+                wanted = (current - stale) | set(extra[:room])
+            rule.members = sorted((matches | (set(rule.members) - stale)) & wanted)
+            self.rules.set(entry_id, rule)
+            if wanted != current:
+                _LOGGER.info(
+                    "Rule of HomeKit bridge %s: +%s -%s",
+                    entry.title,
+                    len(wanted - current),
+                    len(current - wanted),
+                )
+                await self.async_set_entities(entry_id, sorted(wanted), by_user=False)
 
     async def _async_reset_accessories(self, entity_ids: list[str]) -> None:
         """Force HomeKit to rebuild accessories whose type changed."""
@@ -919,3 +1206,6 @@ class BridgeManager:
         async with self._locks[entry_id]:
             await self.hass.config_entries.async_remove(entry_id)
         self._locks.pop(entry_id, None)
+        if self.rules is not None:
+            self.rules.remove(entry_id)
+        ir.async_delete_issue(self.hass, DOMAIN, f"missing_entities_{entry_id}")

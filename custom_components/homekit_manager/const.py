@@ -29,10 +29,91 @@ HK_CONF_EXCLUDE_ACCESSORY_MODE: Final = "exclude_accessory_mode"
 HK_MODE_BRIDGE: Final = "bridge"
 HK_MODE_ACCESSORY: Final = "accessory"
 
-# Entity config keys managed by the panel
+# Entity config keys managed by the panel (same keys as core HomeKit YAML)
 EC_NAME: Final = "name"
 EC_TYPE: Final = "type"
-MANAGED_ENTITY_CONFIG_KEYS: Final = (EC_NAME, EC_TYPE)
+EC_CODE: Final = "code"
+EC_FEATURE_LIST: Final = "feature_list"
+EC_LOW_BATTERY_THRESHOLD: Final = "low_battery_threshold"
+
+# Media player functions HomeKit can expose as switches
+MEDIA_PLAYER_FEATURES: Final = ("on_off", "play_pause", "play_stop", "toggle_mute")
+
+# Domains where HomeKit can use a code to arm/disarm or lock/unlock
+CODE_DOMAINS: Final = ("alarm_control_panel", "lock")
+
+
+class LinkField:
+    """A sensor HomeKit can link to an accessory (entity_config key)."""
+
+    def __init__(
+        self,
+        domains: tuple[str, ...],
+        device_classes: tuple[str, ...] = (),
+        applies_to: tuple[str, ...] | None = None,
+        requires_type: str | None = None,
+    ) -> None:
+        """Describe a link: allowed domains, preferred classes, target domains."""
+        self.domains = domains
+        self.device_classes = device_classes
+        self.applies_to = applies_to
+        self.requires_type = requires_type
+
+    def as_dict(self) -> dict:
+        """Serialize for the panel."""
+        return {
+            "domains": list(self.domains),
+            "device_classes": list(self.device_classes),
+            "applies_to": list(self.applies_to) if self.applies_to else None,
+            "requires_type": self.requires_type,
+        }
+
+
+LINK_FIELDS: Final[dict[str, LinkField]] = {
+    "linked_battery_sensor": LinkField(("sensor",), ("battery",)),
+    "linked_battery_charging_sensor": LinkField(
+        ("binary_sensor",), ("battery_charging",)
+    ),
+    "linked_motion_sensor": LinkField(
+        ("binary_sensor", "event"), ("motion", "occupancy", "presence"), ("camera",)
+    ),
+    "linked_doorbell_sensor": LinkField(
+        ("binary_sensor", "event"), ("doorbell",), ("camera", "lock")
+    ),
+    "linked_humidity_sensor": LinkField(
+        ("sensor",), ("humidity",), ("humidifier", "fan")
+    ),
+    "linked_pm25_sensor": LinkField(("sensor",), ("pm25",), ("fan",), "air_purifier"),
+    "linked_temperature_sensor": LinkField(
+        ("sensor",), ("temperature",), ("fan",), "air_purifier"
+    ),
+    "linked_filter_change_indication_binary_sensor": LinkField(
+        ("binary_sensor",), ("problem",), ("fan",), "air_purifier"
+    ),
+    "linked_filter_life_level_sensor": LinkField(
+        ("sensor",), (), ("fan",), "air_purifier"
+    ),
+    "linked_obstruction_sensor": LinkField(
+        ("binary_sensor",), ("problem",), ("cover",)
+    ),
+}
+
+MANAGED_ENTITY_CONFIG_KEYS: Final = (
+    EC_NAME,
+    EC_TYPE,
+    EC_CODE,
+    EC_FEATURE_LIST,
+    EC_LOW_BATTERY_THRESHOLD,
+    *LINK_FIELDS,
+)
+
+# Storage of the automatic assignment rules
+RULES_STORAGE_KEY: Final = f"{DOMAIN}.rules"
+RULES_STORAGE_VERSION: Final = 1
+# Delays before automatic maintenance runs
+RULES_SYNC_COOLDOWN: Final = 15.0
+MISSING_CHECK_COOLDOWN: Final = 30.0
+STARTUP_GRACE: Final = 120.0
 
 # HomeKit limits: 150 accessories per bridge including the bridge itself
 MAX_BRIDGED_ACCESSORIES: Final = 149

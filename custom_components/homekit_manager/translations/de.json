@@ -32,5 +32,18 @@
         }
       }
     }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "HomeKit {name} enthält gelöschte Entitäten",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Gelöschte Entitäten aus HomeKit entfernen",
+            "description": "Diese Entitäten gibt es in Home Assistant nicht mehr, sie sind aber noch der HomeKit-Instanz **{name}** zugewiesen:\n\n{entities}\n\nAbsenden entfernt sie. Ein Einzelgerät, dessen Entität gelöscht wurde, wird komplett entfernt."
+          }
+        }
+      }
+    }
   }
 }

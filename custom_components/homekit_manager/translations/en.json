@@ -32,5 +32,18 @@
         }
       }
     }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "HomeKit {name} exposes deleted entities",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Remove deleted entities from HomeKit",
+            "description": "These entities no longer exist in Home Assistant but are still assigned to the HomeKit instance **{name}**:\n\n{entities}\n\nSubmit to remove them. A standalone accessory whose entity was deleted is removed completely."
+          }
+        }
+      }
+    }
   }
 }

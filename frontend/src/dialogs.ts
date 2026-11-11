@@ -1,22 +1,20 @@
 import { LitElement, css, html, nothing, type PropertyValues } from "lit";
 import {
-  mdiAlertOutline,
   mdiArrowLeft,
   mdiChevronRight,
   mdiClose,
   mdiHomeAutomation,
   mdiInformationOutline,
   mdiMagnify,
-  mdiOpenInNew,
   mdiStarOutline,
   mdiTelevision,
 } from "@mdi/js";
-import type { EntityInfo, EntityOptions, HassEntityState, HomeAssistant } from "./api";
+import type { EntityInfo, HomeAssistant } from "./api";
 import type { Translate } from "./i18n";
-import { accessoryTypeLabel, domainIcon, optionLabel, typeFromOption } from "./meta";
+import { accessoryTypeLabel, domainIcon } from "./meta";
 import { controls, icon, tokens } from "./styles";
 
-const fire = (el: HTMLElement, name: string, detail?: unknown) =>
+export const fire = (el: HTMLElement, name: string, detail?: unknown) =>
   el.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
 
 /** Modal shell built on the native <dialog> element (top layer). */
@@ -296,305 +294,6 @@ export class HkmBridgeForm extends LitElement {
       .error {
         color: var(--hkm-error);
         font-size: 13px;
-      }
-    `,
-  ];
-}
-
-/** Per-entity details: assignment, HomeKit name and accessory type. */
-export class HkmEntityDialog extends LitElement {
-  static properties = {
-    hass: { attribute: false },
-    t: { attribute: false },
-    german: { type: Boolean },
-    entity: { attribute: false },
-    assigned: { type: Boolean },
-    options: { attribute: false },
-    typeOptions: { attribute: false },
-    otherBridges: { attribute: false },
-    canBeAccessory: { type: Boolean },
-    _assigned: { state: true },
-    _name: { state: true },
-    _type: { state: true },
-  };
-
-  declare hass: HomeAssistant;
-  declare t: Translate;
-  declare german: boolean;
-  declare entity: EntityInfo;
-  declare assigned: boolean;
-  declare options: EntityOptions;
-  declare typeOptions: string[] | undefined;
-  declare otherBridges: string[];
-  declare canBeAccessory: boolean;
-  declare _assigned: boolean;
-  declare _name: string;
-  declare _type: string;
-
-  willUpdate(changed: PropertyValues) {
-    if (changed.has("entity") || changed.has("options") || changed.has("assigned")) {
-      this._assigned = this.assigned;
-      this._name = this.options?.name ?? "";
-      this._type = this.options?.type ?? "";
-    }
-  }
-
-  private _save() {
-    fire(this, "save-entity", {
-      entityId: this.entity.entity_id,
-      assigned: this._assigned,
-      options: { name: this._name.trim() || null, type: this._type || null },
-    });
-    this.renderRoot.querySelector<HkmDialog>("hkm-dialog")?.close();
-  }
-
-  private _makeAccessory = () => {
-    fire(this, "make-accessory", { entityId: this.entity.entity_id });
-    this.renderRoot.querySelector<HkmDialog>("hkm-dialog")?.close();
-  };
-
-  private _moreInfo() {
-    const entityId = this.entity.entity_id;
-    this.renderRoot.querySelector<HkmDialog>("hkm-dialog")?.close();
-    fire(this, "hass-more-info", { entityId });
-  }
-
-  private _stateIcon(stateObj: HassEntityState | undefined) {
-    if (stateObj && customElements.get("ha-state-icon")) {
-      return html`<ha-state-icon .hass=${this.hass} .stateObj=${stateObj}></ha-state-icon>`;
-    }
-    return icon(domainIcon(this.entity.domain));
-  }
-
-  render() {
-    const t = this.t;
-    const e = this.entity;
-    const stateObj = this.hass.states[e.entity_id];
-    const resolved = typeFromOption(e.domain, this._type) ?? e.accessory_type;
-    const typeLabel = accessoryTypeLabel(resolved, e.domain, e.device_class, this.german);
-    const autoLabel = accessoryTypeLabel(e.accessory_type, e.domain, e.device_class, this.german);
-    const stateText = stateObj
-      ? this.hass.formatEntityState?.(stateObj) ?? stateObj.state
-      : "—";
-    const typeChanged = (this.options?.type ?? "") !== this._type && this.assigned;
-    return html`
-      <hkm-dialog .heading=${e.name} wide>
-        <div slot="icon" class="hero-icon ${this._assigned ? "on" : ""}">
-          ${this._stateIcon(stateObj)}
-        </div>
-
-        <div class="assign" @click=${() => (this._assigned = !this._assigned)}>
-          <div>
-            <div class="assign-title">${t("entity_in_bridge")}</div>
-            <div class="mono">${e.entity_id}</div>
-          </div>
-          <button
-            class="switch"
-            role="switch"
-            aria-checked=${String(this._assigned)}
-            aria-label=${t("entity_in_bridge")}
-          ></button>
-        </div>
-
-        ${!e.supported
-          ? html`<div class="note warning">${icon(mdiAlertOutline)}<span>${t("warn_unsupported")}</span></div>`
-          : nothing}
-        ${e.needs_accessory_mode
-          ? html`<div class="note info">
-              ${icon(mdiInformationOutline)}
-              <div>
-                <span>${t("warn_accessory_mode")}</span>
-                ${this.canBeAccessory
-                  ? html`<button class="btn small tonal note-action" @click=${this._makeAccessory}>
-                      ${icon(mdiTelevision)} ${t("make_accessory")}
-                    </button>`
-                  : nothing}
-              </div>
-            </div>`
-          : nothing}
-
-        <div class="form">
-          <div class="field">
-            <label for="hk-name">${t("homekit_name")}</label>
-            <input
-              id="hk-name"
-              .value=${this._name}
-              placeholder=${e.name}
-              maxlength="64"
-              autocomplete="off"
-              @input=${(ev: InputEvent) => (this._name = (ev.target as HTMLInputElement).value)}
-            />
-            <span class="helper">${t("homekit_name_helper")}</span>
-          </div>
-          ${this.typeOptions?.length
-            ? html`<div class="field">
-                <label for="hk-type">${t("accessory_type")}</label>
-                <select
-                  id="hk-type"
-                  @change=${(ev: Event) => (this._type = (ev.target as HTMLSelectElement).value)}
-                >
-                  <option value="" ?selected=${!this._type}>
-                    ${t("accessory_type_auto", { type: autoLabel ?? "—" })}
-                  </option>
-                  ${this.typeOptions.map(
-                    (opt) =>
-                      html`<option value=${opt} ?selected=${this._type === opt}>
-                        ${optionLabel(opt, this.german)}
-                      </option>`,
-                  )}
-                </select>
-                ${typeChanged
-                  ? html`<span class="helper warn">${t("warn_type_reset")}</span>`
-                  : nothing}
-              </div>`
-            : nothing}
-        </div>
-
-        <dl class="facts">
-          <div><dt>${t("info_type")}</dt><dd>${typeLabel ?? "—"}</dd></div>
-          <div><dt>${t("info_state")}</dt><dd>${stateText}</dd></div>
-          <div><dt>${t("info_area")}</dt><dd>${e.area ?? "—"}</dd></div>
-          <div><dt>${t("info_device")}</dt><dd>${e.device ?? "—"}</dd></div>
-          <div><dt>${t("info_integration")}</dt><dd>${e.platform ?? "—"}</dd></div>
-        </dl>
-        ${this.otherBridges.length
-          ? html`<div class="others">
-              ${this.otherBridges.map(
-                (name) => html`<span class="badge">${t("badge_other_bridge", { name })}</span>`,
-              )}
-            </div>`
-          : nothing}
-
-        <button slot="actions" class="btn" @click=${this._moreInfo}>
-          ${icon(mdiOpenInNew)} ${t("open_more_info")}
-        </button>
-        <span slot="actions" class="spacer"></span>
-        <button
-          slot="actions"
-          class="btn outlined"
-          @click=${() => this.renderRoot.querySelector<HkmDialog>("hkm-dialog")?.close()}
-        >
-          ${t("cancel")}
-        </button>
-        <button slot="actions" class="btn filled" @click=${this._save}>${t("done")}</button>
-      </hkm-dialog>
-    `;
-  }
-
-  static styles = [
-    tokens,
-    controls,
-    css`
-      .hero-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 44px;
-        height: 44px;
-        border-radius: 14px;
-        background: var(--hkm-surface-3);
-        color: var(--hkm-text-2);
-        flex: none;
-        --mdc-icon-size: 24px;
-      }
-      .hero-icon svg {
-        width: 24px;
-        height: 24px;
-        fill: currentColor;
-      }
-      .hero-icon.on {
-        background: var(--hkm-tint);
-        color: var(--hkm-primary);
-      }
-      .assign {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 14px 16px;
-        border-radius: 14px;
-        background: var(--hkm-surface-2);
-        cursor: pointer;
-        margin-bottom: 16px;
-      }
-      .assign-title {
-        font-weight: 500;
-      }
-      .mono {
-        font-family: var(--code-font-family, ui-monospace, SFMono-Regular, Menlo, monospace);
-        font-size: 12px;
-        color: var(--hkm-text-2);
-        overflow-wrap: anywhere;
-        margin-top: 2px;
-      }
-      .note {
-        display: flex;
-        gap: 10px;
-        align-items: flex-start;
-        padding: 12px 14px;
-        border-radius: 12px;
-        font-size: 13px;
-        line-height: 1.5;
-        margin-bottom: 12px;
-      }
-      .note svg {
-        width: 18px;
-        height: 18px;
-        flex: none;
-        fill: currentColor;
-        margin-top: 1px;
-      }
-      .note.warning {
-        background: color-mix(in srgb, var(--hkm-warning) 14%, transparent);
-      }
-      .note.info {
-        background: var(--hkm-tint);
-      }
-      .note > div {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .note-action {
-        margin-top: 10px;
-      }
-      .form {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-      }
-      .helper.warn {
-        color: color-mix(in srgb, var(--hkm-warning) 70%, var(--hkm-text));
-      }
-      .facts {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 12px 20px;
-        margin: 20px 0 4px;
-        padding: 16px 0 0;
-        border-top: 1px solid var(--hkm-divider);
-      }
-      .facts div {
-        min-width: 0;
-      }
-      dt {
-        font-size: 12px;
-        color: var(--hkm-text-2);
-        margin-bottom: 2px;
-      }
-      dd {
-        margin: 0;
-        font-size: 14px;
-        overflow-wrap: anywhere;
-      }
-      .others {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-        margin-top: 14px;
-      }
-      .spacer {
-        flex: 1;
       }
     `,
   ];
@@ -1109,6 +808,5 @@ const define = (name: string, ctor: CustomElementConstructor) => {
 define("hkm-dialog", HkmDialog);
 define("hkm-confirm", HkmConfirm);
 define("hkm-bridge-form", HkmBridgeForm);
-define("hkm-entity-dialog", HkmEntityDialog);
 define("hkm-new-dialog", HkmNewDialog);
 define("hkm-accessory-picker", HkmAccessoryPicker);

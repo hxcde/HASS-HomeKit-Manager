@@ -26,6 +26,8 @@ from .const import (
     PANEL_URL_PATH,
     STATIC_URL,
 )
+from .rules import RulesStore
+from .sync import EntitySync
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,7 +49,14 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up HomeKit Manager from a config entry."""
     data = hass.data.setdefault(DOMAIN, {})
-    data["manager"] = BridgeManager(hass)
+    rules = RulesStore(hass)
+    await rules.async_load()
+    manager = BridgeManager(hass, rules)
+    sync = EntitySync(hass, manager)
+    data["manager"] = manager
+    data["sync"] = sync
+    sync.async_start()
+    entry.async_on_unload(sync.async_stop)
 
     integration = await async_get_integration(hass, DOMAIN)
     panel_file = FRONTEND_DIR / PANEL_FILENAME
@@ -78,4 +87,5 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload the panel; HomeKit bridges keep running."""
     frontend.async_remove_panel(hass, PANEL_URL_PATH, warn_if_unknown=False)
     hass.data.get(DOMAIN, {}).pop("manager", None)
+    hass.data.get(DOMAIN, {}).pop("sync", None)
     return True

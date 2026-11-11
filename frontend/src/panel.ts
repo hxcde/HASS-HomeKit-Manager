@@ -2,6 +2,7 @@ import { LitElement, css, html, nothing, type PropertyValues, type TemplateResul
 import {
   mdiAlertCircleOutline,
   mdiAlertOutline,
+  mdiAutoFix,
   mdiCheck,
   mdiCheckCircle,
   mdiChevronDown,
@@ -32,6 +33,8 @@ import {
   fetchEntities,
   fetchPairing,
   restartBridge,
+  setEntityOptions,
+  setRule,
   unpairBridge,
   updateBridgeSettings,
   type Bridge,
@@ -41,8 +44,12 @@ import {
   type HassEntityState,
   type HomeAssistant,
   type Pairing,
+  type RuleInput,
 } from "./api";
 import "./dialogs";
+import "./entity-dialog";
+import "./rules-dialog";
+import { combinePatches, effectivePatch, mergeOptions, patchChanges } from "./options";
 import { getTranslator, isGerman, type Translate } from "./i18n";
 import {
   CATEGORIES,
@@ -57,7 +64,8 @@ type View = "all" | "assigned" | "unassigned";
 type GroupBy = "area" | "domain" | "none";
 
 type DialogState =
-  | { kind: "entity"; entityId: string }
+  | { kind: "entity"; entityId: string; accessoryId?: string }
+  | { kind: "rules" }
   | { kind: "new" }
   | { kind: "create" }
   | { kind: "add-accessory"; entityId?: string }
@@ -99,8 +107,6 @@ const storage = {
   },
 };
 
-const sameOptions = (a: EntityOptions | undefined, b: EntityOptions | undefined) =>
-  (a?.name || null) === (b?.name || null) && (a?.type || null) === (b?.type || null);
 
 class HomeKitManagerPanel extends LitElement {
   static properties = {
@@ -340,9 +346,7 @@ class HomeKitManagerPanel extends LitElement {
   }
 
   private _options(entityId: string): EntityOptions {
-    const base = this._bridge?.entity_config[entityId] ?? {};
-    const patch = this._draftConfig[entityId];
-    return patch ? { ...base, ...patch } : base;
+    return mergeOptions(this._bridge?.entity_config[entityId], this._draftConfig[entityId]);
   }
 
   private get _changes() {
@@ -351,8 +355,8 @@ class HomeKitManagerPanel extends LitElement {
     const current = new Set(bridge.entities);
     const added = [...this._draft].filter((id) => !current.has(id));
     const removed = bridge.entities.filter((id) => !this._draft.has(id));
-    const config = Object.keys(this._draftConfig).filter(
-      (id) => !sameOptions(bridge.entity_config[id], this._options(id)),
+    const config = Object.keys(this._draftConfig).filter((id) =>
+      patchChanges(bridge.entity_config[id], this._draftConfig[id]),
     );
     return { added, removed, config };
   }
@@ -412,8 +416,7 @@ class HomeKitManagerPanel extends LitElement {
     const { config } = this._changes;
     const patch: Record<string, EntityOptions> = {};
     for (const id of config) {
-      const opts = this._options(id);
-      patch[id] = { name: opts.name || null, type: opts.type || null };
+      patch[id] = effectivePatch(bridge.entity_config[id], this._draftConfig[id]);
     }
     const updated = await this._run(
       this._t("applying"),
@@ -496,6 +499,41 @@ class HomeKitManagerPanel extends LitElement {
       this._replaceBridge(updated);
       this._loadPairingFor(entryId);
     }
+  }
+
+  private async _saveAccessoryOptions(entryId: string, entityId: string, patch: EntityOptions) {
+    const updated = await this._run(
+      this._t("saving"),
+      () => setEntityOptions(this.hass, entryId, entityId, patch),
+      this._t("saved"),
+    );
+    if (updated) {
+      this._replaceBridge(updated);
+      this._loadPairingFor(entryId);
+    }
+  }
+
+  private async _saveRule(rule: RuleInput, reset: boolean) {
+    const bridge = this._bridge;
+    if (!bridge) return;
+    const updated = await this._run(
+      this._t("applying"),
+      () => setRule(this.hass, bridge.entry_id, rule, reset),
+      this._t(rule.enabled ? "rules_saved" : "rules_disabled"),
+    );
+    if (updated) {
+      this._replaceBridge(updated);
+      this._resetDraft();
+      this._reloadEntities();
+      this._loadPairing();
+    }
+  }
+
+  /** Drop deleted entities from the draft (applied with the apply bar). */
+  private _removeMissingFromDraft(ids: string[]) {
+    const draft = new Set(this._draft);
+    for (const id of ids) draft.delete(id);
+    this._draft = draft;
   }
 
   private _askDelete(entryId: string) {
@@ -844,6 +882,17 @@ class HomeKitManagerPanel extends LitElement {
           </div>
 
           <div class="hero-actions">
+            ${bridge.manageable && !bridge.yaml
+              ? html`<button
+                  class="btn small ${bridge.rule?.enabled ? "tonal" : "outlined"}"
+                  ?disabled=${busy || this._isDirty}
+                  title=${this._isDirty ? t("rules_dirty") : t("rules_title")}
+                  @click=${() => (this._dialog = { kind: "rules" })}
+                >
+                  ${icon(mdiAutoFix)} ${t("rules_button")}
+                  ${bridge.rule?.enabled ? html`<span class="pill">${t("rules_active")}</span>` : nothing}
+                </button>`
+              : nothing}
             ${bridge.yaml
               ? nothing
               : html`<button class="btn outlined small" ?disabled=${busy} @click=${() => (this._dialog = { kind: "settings", entryId: bridge.entry_id })}>
@@ -995,6 +1044,18 @@ class HomeKitManagerPanel extends LitElement {
               >
                 ${icon(mdiCog)}
               </button>`}
+          ${entity
+            ? html`<button
+                class="icon-btn"
+                title=${t("action_options")}
+                aria-label=${t("action_options")}
+                ?disabled=${busy || acc.yaml}
+                @click=${() =>
+                  (this._dialog = { kind: "entity", entityId: entity.entity_id, accessoryId: acc.entry_id })}
+              >
+                ${icon(mdiTuneVariant)}
+              </button>`
+            : nothing}
           <button
             class="icon-btn"
             title=${t("action_restart")}
@@ -1052,6 +1113,38 @@ class HomeKitManagerPanel extends LitElement {
     );
   }
 
+  private _renderHealth(bridge: Bridge) {
+    const t = this._t;
+    const missing = bridge.missing.filter((id) => this._draft.has(id));
+    const unavailable = bridge.unavailable.filter((id) => !this.hass.states[id]);
+    if (!missing.length && !unavailable.length) return nothing;
+    return html`<section class="card health">
+      ${missing.length
+        ? html`<div class="health-row">
+            <div class="health-icon">${icon(mdiAlertOutline)}</div>
+            <div class="health-body">
+              <strong>${t("missing_title", { count: missing.length })}</strong>
+              <p>${t("missing_text")}</p>
+              <div class="ids">${missing.map((id) => html`<code>${id}</code>`)}</div>
+            </div>
+            <button class="btn small tonal" @click=${() => this._removeMissingFromDraft(missing)}>
+              ${t("missing_remove")}
+            </button>
+          </div>`
+        : nothing}
+      ${unavailable.length
+        ? html`<div class="health-row muted">
+            <div class="health-icon">${icon(mdiInformationOutline)}</div>
+            <div class="health-body">
+              <strong>${t("unavailable_title")}</strong>
+              <p>${t("unavailable_text")}</p>
+              <div class="ids">${unavailable.map((id) => html`<code>${id}</code>`)}</div>
+            </div>
+          </div>`
+        : nothing}
+    </section>`;
+  }
+
   private _renderEntities(bridge: Bridge) {
     const t = this._t;
     const base = this._baseEntities();
@@ -1068,6 +1161,7 @@ class HomeKitManagerPanel extends LitElement {
       this._search || this._view !== "all" || this._categories.size || this._showHidden || this._showUnsupported;
 
     return html`
+      ${this._renderHealth(bridge)}
       <section class="filters">
         <div class="search">
           ${icon(mdiMagnify)}
@@ -1233,7 +1327,7 @@ class HomeKitManagerPanel extends LitElement {
     const was = bridge.entities.includes(e.entity_id);
     const pending = on !== was ? (on ? "adding" : "removing") : "";
     const options = this._options(e.entity_id);
-    const configChanged = !sameOptions(bridge.entity_config[e.entity_id], options);
+    const configChanged = patchChanges(bridge.entity_config[e.entity_id], this._draftConfig[e.entity_id]);
     const stateObj = this.hass.states[e.entity_id];
     const typeLabel = accessoryTypeLabel(
       typeFromOption(e.domain, options.type) ?? e.accessory_type,
@@ -1282,6 +1376,9 @@ class HomeKitManagerPanel extends LitElement {
                 : nothing}
             ${e.hidden ? html`<span class="badge">${t("badge_hidden")}</span>` : nothing}
             ${e.entity_category ? html`<span class="badge">${t("badge_diagnostic")}</span>` : nothing}
+            ${bridge.rule?.enabled && bridge.rule.members.includes(e.entity_id)
+              ? html`<span class="badge primary">${icon(mdiAutoFix)}${t("badge_auto")}</span>`
+              : nothing}
             ${others.map((name) => html`<span class="badge">${t("badge_other_bridge", { name })}</span>`)}
             ${pending
               ? html`<span class="badge ${pending === "adding" ? "success" : "error"}">
@@ -1411,7 +1508,8 @@ class HomeKitManagerPanel extends LitElement {
         ></hkm-bridge-form>`;
       }
       case "entity": {
-        const bridge = this._bridge;
+        const accessory = dialog.accessoryId ? this._instance(dialog.accessoryId) : undefined;
+        const bridge = accessory ?? this._bridge;
         const entity = this._entities?.entities.find((e) => e.entity_id === dialog.entityId);
         if (!bridge || !entity) return nothing;
         const others = entity.bridges
@@ -1423,24 +1521,53 @@ class HomeKitManagerPanel extends LitElement {
           .hass=${this.hass}
           .t=${t}
           ?german=${this._german}
+          ?standalone=${Boolean(accessory)}
           .entity=${entity}
-          .assigned=${this._draft.has(entity.entity_id)}
-          .options=${this._options(entity.entity_id)}
+          .assigned=${accessory ? true : this._draft.has(entity.entity_id)}
+          .options=${accessory
+            ? accessory.entity_config[entity.entity_id] ?? {}
+            : this._options(entity.entity_id)}
           .typeOptions=${this._entities?.type_options[entity.domain]}
+          .linkFields=${this._entities?.link_fields ?? {}}
+          .linkCandidates=${this._entities?.link_candidates ?? []}
           .otherBridges=${others}
           ?canBeAccessory=${canBeAccessory}
           @make-accessory=${(ev: CustomEvent) => {
             this._nextDialog = { kind: "add-accessory", entityId: ev.detail.entityId };
           }}
           @save-entity=${(ev: CustomEvent) => {
-            const { entityId, assigned, options } = ev.detail;
+            const { entityId, assigned, patch } = ev.detail as {
+              entityId: string;
+              assigned: boolean;
+              patch: EntityOptions;
+            };
+            if (accessory) {
+              if (Object.keys(patch).length) this._saveAccessoryOptions(accessory.entry_id, entityId, patch);
+              return;
+            }
             this._toggle(entityId, assigned);
-            if (!sameOptions(this._options(entityId), options)) {
-              this._draftConfig = { ...this._draftConfig, [entityId]: options };
+            if (Object.keys(patch).length) {
+              this._draftConfig = {
+                ...this._draftConfig,
+                [entityId]: combinePatches(this._draftConfig[entityId], patch),
+              };
             }
           }}
           @closed=${close}
         ></hkm-entity-dialog>`;
+      }
+      case "rules": {
+        const bridge = this._bridge;
+        if (!bridge || !this._entities) return nothing;
+        return html`<hkm-rules-dialog
+          .hass=${this.hass}
+          .t=${t}
+          .entryId=${bridge.entry_id}
+          .rule=${bridge.rule}
+          .data=${this._entities}
+          @save-rule=${(ev: CustomEvent) => this._saveRule(ev.detail.rule, ev.detail.reset)}
+          @closed=${close}
+        ></hkm-rules-dialog>`;
       }
     }
     return nothing;
@@ -2262,6 +2389,72 @@ class HomeKitManagerPanel extends LitElement {
         border-top-color: #fff;
       }
 
+      .pill {
+        margin-left: 2px;
+        padding: 1px 7px;
+        border-radius: 999px;
+        background: var(--hkm-primary);
+        color: var(--hkm-on-primary);
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .health {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 18px 20px;
+        border-color: color-mix(in srgb, var(--hkm-warning) 45%, var(--hkm-divider));
+      }
+      .health-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .health-row + .health-row {
+        padding-top: 14px;
+        border-top: 1px solid var(--hkm-divider);
+      }
+      .health-icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--hkm-warning) 18%, transparent);
+      }
+      .health-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: color-mix(in srgb, var(--hkm-warning) 75%, var(--hkm-text));
+      }
+      .health-row.muted .health-icon {
+        background: var(--hkm-surface-3);
+      }
+      .health-row.muted .health-icon svg {
+        fill: var(--hkm-text-2);
+      }
+      .health-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .health-body p {
+        margin: 2px 0 8px;
+        font-size: 13px;
+        color: var(--hkm-text-2);
+      }
+      .ids {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .ids code {
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: var(--hkm-surface-3);
+        font-size: 12px;
+      }
+
       /* Standalone accessories */
       .tab svg {
         width: 18px;
@@ -2419,6 +2612,9 @@ class HomeKitManagerPanel extends LitElement {
         }
         .chips {
           flex-wrap: nowrap;
+        }
+        .health-row {
+          flex-wrap: wrap;
         }
         .pairing-body {
           flex-direction: column;
