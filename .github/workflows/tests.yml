@@ -17,12 +17,10 @@ jobs:
       matrix:
         python: ["3.13", "3.14"]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-      - name: System libraries for the camera/stream components
-        run: sudo apt-get update && sudo apt-get install -y libturbojpeg ffmpeg
       - name: Install Home Assistant test harness
         run: |
           pip install pytest-homeassistant-custom-component ruff
@@ -41,8 +39,8 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm

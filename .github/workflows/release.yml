@@ -12,7 +12,7 @@ jobs:
     name: Attach zip
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Check version matches tag
         run: |
           version=$(python3 -c "import json;print(json.load(open('custom_components/homekit_manager/manifest.json'))['version'])")
