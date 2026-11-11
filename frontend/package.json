@@ -2,6 +2,7 @@
   "name": "homekit-manager-panel",
   "version": "0.2.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "description": "Sidebar panel for the HomeKit Manager Home Assistant integration",
   "scripts": {

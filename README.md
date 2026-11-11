@@ -51,4 +51,4 @@ HomeKit Manager adds a **HomeKit** sidebar page to Home Assistant. Create HomeKi
 
 ## Lizenz / Kontakt
 
-Fehler und Wünsche bitte als [GitHub Issue](https://github.com/hxcde/HASS-HomeKit-Manager/issues). HomeKit und Apple Home sind Marken von Apple Inc.; dieses Projekt steht in keiner Verbindung zu Apple.
+[MIT](./LICENSE). Fehler und Wünsche bitte als [GitHub Issue](https://github.com/hxcde/HASS-HomeKit-Manager/issues). HomeKit und Apple Home sind Marken von Apple Inc.; dieses Projekt steht in keiner Verbindung zu Apple.

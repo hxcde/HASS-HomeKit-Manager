@@ -38,7 +38,7 @@ Release (Marketplace/HACS verlangt passende Version):
 1. `version` in `custom_components/homekit_manager/manifest.json` und `frontend/package.json` erhöhen.
 2. Panel bauen: `cd frontend && npm ci && npm run build` – das Bundle unter `custom_components/homekit_manager/frontend/` wird mit eingecheckt.
 3. Commit, Tag `vX.Y.Z` bzw. `X.Y.Z` = Manifest-Version, GitHub-Release veröffentlichen. Workflow `release.yml` prüft Tag ↔ Manifest und hängt `homekit_manager.zip` an.
-4. Für die Aufnahme in den Katalog (hacs/default): Repo öffentlich, Beschreibung und Topics gesetzt, Issues aktiviert, Workflows `validate.yml` (hassfest + HACS-Action) grün.
+4. Für die Aufnahme in den Katalog (hacs/default): Repo öffentlich, Lizenz (MIT, `LICENSE`), Beschreibung und Topics gesetzt (GitHub → Repo → *About* → Zahnrad), Issues aktiviert, Workflows `validate.yml` (hassfest + HACS-Action) grün.
 
 CI:
 - `validate.yml`: hassfest, HACS-Action (`category: integration`), täglich und bei Push/PR.

@@ -1,6 +1,7 @@
 {
   "domain": "homekit_manager",
   "name": "HomeKit Manager",
+  "categories": ["other_ecosystems"],
   "codeowners": ["@hxcde"],
   "config_flow": true,
   "dependencies": [
