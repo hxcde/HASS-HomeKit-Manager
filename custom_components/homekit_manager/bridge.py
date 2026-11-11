@@ -59,6 +59,7 @@ from .const import (
     HOMEKIT_DOMAIN,
     MAX_BRIDGED_ACCESSORIES,
 )
+from .controllers import async_controllers
 from .entity_options import (
     EntityOptionError,
     apply_patch,
@@ -446,6 +447,13 @@ class BridgeManager:
                     (entry.entry_id, self._implicit_member_check(compiled))
                 )
 
+        controllers = async_controllers(hass)
+        controlled_by = {
+            entity_id: controller.entity_id
+            for controller in controllers.values()
+            for entity_id in controller.controls
+        }
+
         link_fields = available_link_fields()
         link_domains = {d for f in link_fields.values() for d in f.domains}
         entities: list[dict[str, Any]] = []
@@ -465,7 +473,14 @@ class BridgeManager:
             if state.domain not in SUPPORTED_DOMAINS:
                 continue
             entities.append(
-                self._describe_entity(state, ent_reg, dev_reg, area_reg, memberships)
+                self._describe_entity(
+                    state,
+                    ent_reg,
+                    dev_reg,
+                    area_reg,
+                    memberships,
+                    controlled_by=controlled_by,
+                )
             )
 
         entities.sort(key=lambda item: (item["name"] or item["entity_id"]).lower())
@@ -481,6 +496,10 @@ class BridgeManager:
             "link_fields": {k: f.as_dict() for k, f in link_fields.items()},
             "link_candidates": candidates,
             "max_accessories": MAX_BRIDGED_ACCESSORIES,
+            "controllers": {
+                entity_id: controller.as_dict()
+                for entity_id, controller in controllers.items()
+            },
         }
 
     def _implicit_member_check(self, compiled: EntityFilter):
@@ -504,6 +523,8 @@ class BridgeManager:
         dev_reg: dr.DeviceRegistry,
         area_reg: ar.AreaRegistry,
         memberships: list[tuple[str, Any]],
+        *,
+        controlled_by: dict[str, str],
     ) -> dict[str, Any]:
         entity_id = state.entity_id
         reg = ent_reg.async_get(entity_id)
@@ -535,6 +556,7 @@ class BridgeManager:
             "accessory_type": accessory_type,
             "supported": accessory_type is not None,
             "needs_accessory_mode": needs_accessory_mode(state),
+            "controlled_by": controlled_by.get(entity_id),
             "bridges": [
                 entry_id for entry_id, member in memberships if member(entity_id)
             ],

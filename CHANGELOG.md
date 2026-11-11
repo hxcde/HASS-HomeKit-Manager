@@ -2,6 +2,14 @@
 
 Alle nennenswerten Änderungen. Versionen folgen [SemVer](https://semver.org/lang/de/); der Tag eines Releases entspricht der `version` in `custom_components/homekit_manager/manifest.json`.
 
+## 0.3.0 – 2026-11-11
+
+### Neu
+- **Better Thermostat und Versatile Thermostat:** Das Panel erkennt Thermostate, die von einer dieser Integrationen geregelt werden (z. B. Heizkörperthermostat mit externem Temperatursensor).
+  - Beim Freigeben des Original-Thermostats schlägt das Panel die regelnde Entität vor. Sonst würde Apple Home die Regelung umgehen und die Temperatur des eingebauten Fühlers zeigen.
+  - Bereits freigegebene Originale zeigt ein Hinweis mit „Durch Better Thermostat ersetzen“.
+  - „Alle hinzufügen“ und „Automatisch zuweisen“ nehmen direkt die regelnde Entität, auch wenn sie selbst keinem Bereich zugeordnet ist.
+
 ## 0.2.1 – 2026-11-11
 
 ### Behoben
