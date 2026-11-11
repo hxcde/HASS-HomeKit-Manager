@@ -141,7 +141,8 @@ def evaluate_rule(hass: HomeAssistant, rule: Rule, taken: set[str]) -> set[str]:
     ``taken`` are entities paired as standalone accessory; they never join a
     bridge automatically. Hidden and diagnostic entities only match by label.
     A thermostat regulated by e.g. Better Thermostat is replaced by the
-    regulating entity, so HomeKit does not bypass the regulation.
+    regulating entity, so HomeKit does not bypass the regulation; an
+    original the user excluded keeps its regulating entity out as well.
     """
     if not rule.has_criteria:
         return set()
@@ -154,6 +155,24 @@ def evaluate_rule(hass: HomeAssistant, rule: Rule, taken: set[str]) -> set[str]:
     domains = set(rule.domains)
     place_rule = bool(labels or areas or floors)
     controlled_by = async_controlled_by(hass)
+    excluded = set(rule.exclude)
+
+    def _labels(reg: er.RegistryEntry | None) -> set[str]:
+        device = dev_reg.async_get(reg.device_id) if reg and reg.device_id else None
+        return set(reg.labels if reg else ()) | set(device.labels if device else ())
+
+    def _controller_eligible(controller: str) -> bool:
+        """The regulating entity joins regardless of its own area, but a
+        hidden/diagnostic one still only through a matching label."""
+        if controller in taken:
+            return False
+        state = hass.states.get(controller)
+        if state is None or resolve_accessory_type(state, None) is None:
+            return False
+        reg = ent_reg.async_get(controller)
+        if reg and (reg.entity_category or reg.hidden_by):
+            return bool(labels & _labels(reg))
+        return True
 
     result: set[str] = set()
     for state in hass.states.async_all():
@@ -167,10 +186,7 @@ def evaluate_rule(hass: HomeAssistant, rule: Rule, taken: set[str]) -> set[str]:
             continue
         reg = ent_reg.async_get(entity_id)
         device = dev_reg.async_get(reg.device_id) if reg and reg.device_id else None
-        entity_labels = set(reg.labels if reg else ()) | set(
-            device.labels if device else ()
-        )
-        label_match = bool(labels & entity_labels)
+        label_match = bool(labels & _labels(reg))
         if place_rule and not label_match:
             area_id = (reg.area_id if reg else None) or (
                 device.area_id if device else None
@@ -184,7 +200,7 @@ def evaluate_rule(hass: HomeAssistant, rule: Rule, taken: set[str]) -> set[str]:
         if reg and (reg.entity_category or reg.hidden_by) and not label_match:
             continue
         if (controller := controlled_by.get(entity_id)) is not None:
-            if controller not in taken:
+            if entity_id not in excluded and _controller_eligible(controller):
                 result.add(controller)
             continue
         result.add(entity_id)

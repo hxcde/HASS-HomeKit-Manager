@@ -11,9 +11,14 @@ from custom_components.homekit_manager.controllers import (
     async_controlled_by,
     async_controllers,
 )
+from custom_components.homekit_manager.rules import Rule, evaluate_rule
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import area_registry as ar, entity_registry as er
+from homeassistant.helpers import (
+    area_registry as ar,
+    entity_registry as er,
+    label_registry as lr,
+)
 
 CLIMATE_ATTRS = {
     "hvac_modes": ["off", "heat"],
@@ -171,3 +176,53 @@ async def test_rules_prefer_controller(hass: HomeAssistant, hass_ws_client) -> N
     await hass.async_block_till_done()
     entry = hass.config_entries.async_get_entry(entry_id)
     assert entry.options["filter"]["include_entities"] == sorted([bt, plain])
+
+
+async def test_rules_respect_hidden_controller(
+    hass: HomeAssistant, hass_ws_client
+) -> None:
+    """A hidden regulating entity only joins through a matching label."""
+    area = ar.async_get(hass).async_create("Bad")
+    label = lr.async_get(hass).async_create("HomeKit")
+    ent_reg = er.async_get(hass)
+    trv = _climate(hass, "heizkoerper_bad")
+    bt = _better_thermostat(hass, "Bad", [trv])
+    ent_reg.async_update_entity(trv, area_id=area.id)
+    ent_reg.async_update_entity(bt, hidden_by=er.RegistryEntryHider.USER)
+    entry_id = await _setup(hass)
+    client = await hass_ws_client(hass)
+
+    async def preview(**criteria) -> list[str]:
+        result = await _ws(
+            client,
+            {
+                "type": "homekit_manager/rules/preview",
+                "entry_id": entry_id,
+                **criteria,
+            },
+        )
+        return result["result"]["entities"]
+
+    # Neither the hidden controller nor the bypassing original
+    assert await preview(areas=[area.id]) == []
+
+    ent_reg.async_update_entity(trv, labels={label.label_id})
+    assert await preview(labels=[label.label_id]) == []
+
+    ent_reg.async_update_entity(bt, labels={label.label_id})
+    assert await preview(labels=[label.label_id]) == [bt]
+
+
+async def test_rules_keep_excluded_original_out(hass: HomeAssistant) -> None:
+    """A thermostat the user removed does not come back as its controller."""
+    area = ar.async_get(hass).async_create("Kinderzimmer")
+    trv = _climate(hass, "heizkoerper_kind")
+    bt = _better_thermostat(hass, "Kind", [trv])
+    er.async_get(hass).async_update_entity(trv, area_id=area.id)
+
+    assert evaluate_rule(hass, Rule(enabled=True, areas=[area.id]), set()) == {bt}
+    assert (
+        evaluate_rule(hass, Rule(enabled=True, areas=[area.id], exclude=[trv]), set())
+        == set()
+    )
+    assert evaluate_rule(hass, Rule(enabled=True, areas=[area.id]), {bt}) == set()
