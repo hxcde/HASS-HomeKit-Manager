@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing, type PropertyValues, type TemplateResult } from "lit";
+import { LitElement, css, html, nothing, type TemplateResult } from "lit";
 import {
   mdiAlertOutline,
   mdiBatteryHigh,
@@ -74,8 +74,13 @@ export class HkmEntityDialog extends LitElement {
   declare _clearCode: boolean;
   declare _battery: boolean;
 
-  willUpdate(changed: PropertyValues) {
-    if (changed.has("entity") || changed.has("options") || changed.has("assigned")) {
+  /** Entity the local draft belongs to; the parent re-renders (and passes
+   *  fresh option objects) on every state update and poll. */
+  private _draftFor?: string;
+
+  willUpdate() {
+    if (this.entity && this._draftFor !== this.entity.entity_id) {
+      this._draftFor = this.entity.entity_id;
       this._assigned = this.assigned;
       const { has_code: _ignored, ...values } = this.options ?? {};
       this._values = values;

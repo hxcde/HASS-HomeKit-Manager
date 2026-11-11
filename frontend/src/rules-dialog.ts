@@ -1,4 +1,4 @@
-import { LitElement, css, html, nothing, type PropertyValues } from "lit";
+import { LitElement, css, html, nothing } from "lit";
 import { mdiAutoFix, mdiLabelOutline } from "@mdi/js";
 import { previewRule, type EntitiesResponse, type HomeAssistant, type Rule } from "./api";
 import { fire, type HkmDialog } from "./dialogs";
@@ -38,8 +38,12 @@ export class HkmRulesDialog extends LitElement {
 
   private _timer?: number;
 
-  willUpdate(changed: PropertyValues) {
-    if (changed.has("rule")) {
+  /** The draft is taken from the rule once; polling passes new rule objects. */
+  private _initialized = false;
+
+  willUpdate() {
+    if (!this._initialized) {
+      this._initialized = true;
       const rule = this.rule;
       this._enabled = rule ? rule.enabled : true;
       this._labels = new Set(rule?.labels ?? []);

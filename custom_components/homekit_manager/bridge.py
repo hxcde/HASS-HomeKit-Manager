@@ -1031,9 +1031,8 @@ class BridgeManager:
         matches = evaluate_rule(self.hass, rule, self._taken_by_accessories())
         exclude = (set(rule.exclude) | ((before - after) & matches)) - after
         rule.exclude = sorted(exclude)
-        rule.members = sorted(
-            (set(rule.members) & after) | ((matches - exclude) & after)
-        )
+        # Entities the user adds by hand stay manual, even if they match
+        rule.members = sorted(set(rule.members) & after)
         self.rules.set(entry_id, rule)
 
     def _rule_from_input(self, entry_id: str, data: dict[str, Any]) -> Rule:
@@ -1103,7 +1102,10 @@ class BridgeManager:
                 extra = sorted(wanted - current)
                 room = max(0, MAX_BRIDGED_ACCESSORIES - len(current - stale))
                 wanted = (current - stale) | set(extra[:room])
-            rule.members = sorted((matches | (set(rule.members) - stale)) & wanted)
+            # Only entities this sync adds become rule members; matches that
+            # were already assigned by hand stay manual and are never removed.
+            added = wanted - current
+            rule.members = sorted(((set(rule.members) - stale) | added) & wanted)
             self.rules.set(entry_id, rule)
             if wanted != current:
                 _LOGGER.info(

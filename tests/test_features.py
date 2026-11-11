@@ -261,3 +261,41 @@ async def test_entity_options(hass: HomeAssistant, hass_ws_client) -> None:
     )
     assert result["success"], result
     assert "has_code" not in result["result"]["bridge"]["entity_config"]["lock.door"]
+
+
+async def test_rules_keep_manual_entities(hass: HomeAssistant, hass_ws_client) -> None:
+    """A manually assigned entity that also matches a rule is never removed."""
+    area = ar.async_get(hass).async_create("Bad")
+    ent_reg = er.async_get(hass)
+    mirror = _registered(hass, "light", "spiegel")
+    ent_reg.async_update_entity(mirror, area_id=area.id)
+    hass.states.async_set(mirror, "on")
+    entry_id = await _setup(hass)
+    client = await hass_ws_client(hass)
+    manager = hass.data[DOMAIN]["manager"]
+
+    await _ws(
+        client,
+        {
+            "type": "homekit_manager/bridge/assign",
+            "entry_id": entry_id,
+            "entities": [mirror],
+        },
+    )
+    result = await _ws(
+        client,
+        {
+            "type": "homekit_manager/rules/set",
+            "entry_id": entry_id,
+            "enabled": True,
+            "areas": [area.id],
+        },
+    )
+    assert result["success"], result
+    assert result["result"]["bridge"]["rule"]["members"] == []
+
+    # It leaves the area: the rule did not add it, so it stays
+    ent_reg.async_update_entity(mirror, area_id=None)
+    await manager.async_sync_rules()
+    await hass.async_block_till_done()
+    assert _filter(hass, entry_id) == [mirror]
