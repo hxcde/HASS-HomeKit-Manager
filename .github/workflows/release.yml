@@ -1,13 +1,21 @@
 name: Release
 
-# Push a tag that equals the manifest version (e.g. `git tag 0.2.0 && git push
-# origin 0.2.0`): this workflow creates the GitHub release with the notes from
-# CHANGELOG.md and attaches the integration as zip.
+# Two ways to release a version that equals the manifest version:
+# - push a tag: `git tag 0.2.0 && git push origin 0.2.0`
+# - Actions → Release → Run workflow on main with the version (creates the tag)
+# The workflow creates the GitHub release with the notes from CHANGELOG.md and
+# attaches the integration as zip.
 on:
   push:
     tags:
       - "[0-9]+.[0-9]+.[0-9]+*"
       - "v[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release, e.g. 0.2.0 (must match manifest.json)"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -16,21 +24,25 @@ jobs:
   release:
     name: Create release
     runs-on: ubuntu-latest
+    # Manual releases only from main
+    if: github.event_name == 'push' || github.ref == 'refs/heads/main'
+    env:
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
     steps:
       - uses: actions/checkout@v5
       - name: Check version matches tag
         run: |
           version=$(python3 -c "import json;print(json.load(open('custom_components/homekit_manager/manifest.json'))['version'])")
-          tag="${GITHUB_REF_NAME#v}"
-          test "$version" = "$tag" || { echo "manifest version $version != tag $tag"; exit 1; }
+          test "$version" = "${TAG#v}" || { echo "manifest version $version != tag $TAG"; exit 1; }
       - name: Release notes from CHANGELOG.md
-        run: python3 script/release_notes.py "${GITHUB_REF_NAME#v}" > release-notes.md
+        run: python3 script/release_notes.py "${TAG#v}" > release-notes.md
       - name: Build zip
         run: cd custom_components/homekit_manager && zip -r ../../homekit_manager.zip . -x "__pycache__/*"
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ env.TAG }}
+          target_commitish: ${{ github.sha }}
+          name: ${{ env.TAG }}
           body_path: release-notes.md
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          prerelease: ${{ contains(env.TAG, '-') }}
           files: homekit_manager.zip
