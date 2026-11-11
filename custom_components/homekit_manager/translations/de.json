@@ -1,0 +1,49 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HomeKit Manager",
+        "description": "HomeKit Manager fügt der Seitenleiste eine **HomeKit**-Seite hinzu. Dort wählst du per Klick aus, welche Entitäten an Apple Home durchgereicht werden – ganz ohne YAML.\n\nGefundene bestehende HomeKit Bridges: {existing}. Diese können später auf der HomeKit-Seite übernommen werden.",
+        "data": {
+          "create_bridge": "Jetzt eine neue HomeKit Bridge anlegen",
+          "bridge_name": "Name der Bridge"
+        },
+        "data_description": {
+          "create_bridge": "Die Bridge startet leer. Entitäten fügst du auf der HomeKit-Seite hinzu und koppelst die Bridge mit der Home-App.",
+          "bridge_name": "Wird in der Home-App angezeigt, 3 bis {max_length} Zeichen."
+        }
+      }
+    },
+    "error": {
+      "invalid_name": "Der Name muss 3 bis 25 Zeichen lang sein.",
+      "create_failed": "Die HomeKit Bridge konnte nicht angelegt werden. Details stehen im Log."
+    },
+    "abort": {
+      "single_instance_allowed": "HomeKit Manager ist bereits eingerichtet. Weitere Bridges legst du auf der HomeKit-Seite in der Seitenleiste an."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Seitenleiste",
+        "data": {
+          "sidebar_title": "Titel in der Seitenleiste",
+          "sidebar_icon": "Icon in der Seitenleiste"
+        }
+      }
+    }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "HomeKit {name} enthält gelöschte Entitäten",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Gelöschte Entitäten aus HomeKit entfernen",
+            "description": "Diese Entitäten gibt es in Home Assistant nicht mehr, sie sind aber noch der HomeKit-Instanz **{name}** zugewiesen:\n\n{entities}\n\nAbsenden entfernt sie. Ein Einzelgerät, dessen Entität gelöscht wurde, wird komplett entfernt."
+          }
+        }
+      }
+    }
+  }
+}

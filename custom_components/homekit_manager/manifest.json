@@ -1,0 +1,22 @@
+{
+  "domain": "homekit_manager",
+  "name": "HomeKit Manager",
+  "categories": ["other_ecosystems"],
+  "codeowners": ["@hxcde"],
+  "config_flow": true,
+  "dependencies": [
+    "frontend",
+    "homekit",
+    "http",
+    "panel_custom",
+    "repairs",
+    "websocket_api"
+  ],
+  "documentation": "https://github.com/hxcde/HASS-HomeKit-Manager",
+  "integration_type": "service",
+  "iot_class": "local_push",
+  "issue_tracker": "https://github.com/hxcde/HASS-HomeKit-Manager/issues",
+  "requirements": [],
+  "single_config_entry": true,
+  "version": "0.2.0"
+}

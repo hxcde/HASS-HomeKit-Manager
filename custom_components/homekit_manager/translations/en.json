@@ -1,0 +1,49 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HomeKit Manager",
+        "description": "HomeKit Manager adds a **HomeKit** page to the sidebar where you pick which entities are exposed to Apple Home, no YAML needed.\n\nExisting HomeKit bridges found: {existing}. They can be adopted later on the HomeKit page.",
+        "data": {
+          "create_bridge": "Create a new HomeKit bridge now",
+          "bridge_name": "Bridge name"
+        },
+        "data_description": {
+          "create_bridge": "The bridge starts empty. You add entities on the HomeKit page and pair it with the Home app.",
+          "bridge_name": "Shown in the Home app, 3 to {max_length} characters."
+        }
+      }
+    },
+    "error": {
+      "invalid_name": "The name must be 3 to 25 characters long.",
+      "create_failed": "The HomeKit bridge could not be created. Check the log for details."
+    },
+    "abort": {
+      "single_instance_allowed": "HomeKit Manager is already set up. Use the HomeKit page in the sidebar to add more bridges."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sidebar",
+        "data": {
+          "sidebar_title": "Sidebar title",
+          "sidebar_icon": "Sidebar icon"
+        }
+      }
+    }
+  },
+  "issues": {
+    "missing_entities": {
+      "title": "HomeKit {name} exposes deleted entities",
+      "fix_flow": {
+        "step": {
+          "confirm": {
+            "title": "Remove deleted entities from HomeKit",
+            "description": "These entities no longer exist in Home Assistant but are still assigned to the HomeKit instance **{name}**:\n\n{entities}\n\nSubmit to remove them. A standalone accessory whose entity was deleted is removed completely."
+          }
+        }
+      }
+    }
+  }
+}
