@@ -1,0 +1,2405 @@
+const Z=globalThis,we=Z.ShadowRoot&&(Z.ShadyCSS===void 0||Z.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,ke=Symbol(),Le=new WeakMap;let Xe=class{constructor(e,t,i){if(this._$cssResult$=!0,i!==ke)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(we&&e===void 0){const i=t!==void 0&&t.length===1;i&&(e=Le.get(t)),e===void 0&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),i&&Le.set(t,e))}return e}toString(){return this.cssText}};const mt=n=>new Xe(typeof n=="string"?n:n+"",void 0,ke),y=(n,...e)=>{const t=n.length===1?n[0]:e.reduce((i,s,r)=>i+(a=>{if(a._$cssResult$===!0)return a.cssText;if(typeof a=="number")return a;throw Error("Value passed to 'css' function must be a 'css' function result: "+a+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(s)+n[r+1],n[0]);return new Xe(t,n,ke)},_t=(n,e)=>{if(we)n.adoptedStyleSheets=e.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const t of e){const i=document.createElement("style"),s=Z.litNonce;s!==void 0&&i.setAttribute("nonce",s),i.textContent=t.cssText,n.appendChild(i)}},Ve=we?n=>n:n=>n instanceof CSSStyleSheet?(e=>{let t="";for(const i of e.cssRules)t+=i.cssText;return mt(t)})(n):n;const{is:ft,defineProperty:bt,getOwnPropertyDescriptor:vt,getOwnPropertyNames:xt,getOwnPropertySymbols:yt,getPrototypeOf:$t}=Object,se=globalThis,Me=se.trustedTypes,wt=Me?Me.emptyScript:"",kt=se.reactiveElementPolyfillSupport,R=(n,e)=>n,le={toAttribute(n,e){switch(e){case Boolean:n=n?wt:null;break;case Object:case Array:n=n==null?n:JSON.stringify(n)}return n},fromAttribute(n,e){let t=n;switch(e){case Boolean:t=n!==null;break;case Number:t=n===null?null:Number(n);break;case Object:case Array:try{t=JSON.parse(n)}catch{t=null}}return t}},et=(n,e)=>!ft(n,e),Ee={attribute:!0,type:String,converter:le,reflect:!1,useDefault:!1,hasChanged:et};Symbol.metadata??=Symbol("metadata"),se.litPropertyMetadata??=new WeakMap;let E=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=Ee){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const i=Symbol(),s=this.getPropertyDescriptor(e,i,t);s!==void 0&&bt(this.prototype,e,s)}}static getPropertyDescriptor(e,t,i){const{get:s,set:r}=vt(this.prototype,e)??{get(){return this[t]},set(a){this[t]=a}};return{get:s,set(a){const c=s?.call(this);r?.call(this,a),this.requestUpdate(e,c,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??Ee}static _$Ei(){if(this.hasOwnProperty(R("elementProperties")))return;const e=$t(this);e.finalize(),e.l!==void 0&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(R("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(R("properties"))){const t=this.properties,i=[...xt(t),...yt(t)];for(const s of i)this.createProperty(s,t[s])}const e=this[Symbol.metadata];if(e!==null){const t=litPropertyMetadata.get(e);if(t!==void 0)for(const[i,s]of t)this.elementProperties.set(i,s)}this._$Eh=new Map;for(const[t,i]of this.elementProperties){const s=this._$Eu(t,i);s!==void 0&&this._$Eh.set(s,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const i=new Set(e.flat(1/0).reverse());for(const s of i)t.unshift(Ve(s))}else e!==void 0&&t.push(Ve(e));return t}static _$Eu(e,t){const i=t.attribute;return i===!1?void 0:typeof i=="string"?i:typeof e=="string"?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),this.renderRoot!==void 0&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const i of t.keys())this.hasOwnProperty(i)&&(e.set(i,this[i]),delete this[i]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return _t(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,i){this._$AK(e,i)}_$ET(e,t){const i=this.constructor.elementProperties.get(e),s=this.constructor._$Eu(e,i);if(s!==void 0&&i.reflect===!0){const r=(i.converter?.toAttribute!==void 0?i.converter:le).toAttribute(t,i.type);this._$Em=e,r==null?this.removeAttribute(s):this.setAttribute(s,r),this._$Em=null}}_$AK(e,t){const i=this.constructor,s=i._$Eh.get(e);if(s!==void 0&&this._$Em!==s){const r=i.getPropertyOptions(s),a=typeof r.converter=="function"?{fromAttribute:r.converter}:r.converter?.fromAttribute!==void 0?r.converter:le;this._$Em=s;const c=a.fromAttribute(t,r.type);this[s]=c??this._$Ej?.get(s)??c,this._$Em=null}}requestUpdate(e,t,i,s=!1,r){if(e!==void 0){const a=this.constructor;if(s===!1&&(r=this[e]),i??=a.getPropertyOptions(e),!((i.hasChanged??et)(r,t)||i.useDefault&&i.reflect&&r===this._$Ej?.get(e)&&!this.hasAttribute(a._$Eu(e,i))))return;this.C(e,t,i)}this.isUpdatePending===!1&&(this._$ES=this._$EP())}C(e,t,{useDefault:i,reflect:s,wrapped:r},a){i&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,a??t??this[e]),r!==!0||a!==void 0)||(this._$AL.has(e)||(this.hasUpdated||i||(t=void 0),this._$AL.set(e,t)),s===!0&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const e=this.scheduleUpdate();return e!=null&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[s,r]of this._$Ep)this[s]=r;this._$Ep=void 0}const i=this.constructor.elementProperties;if(i.size>0)for(const[s,r]of i){const{wrapped:a}=r,c=this[s];a!==!0||this._$AL.has(s)||c===void 0||this.C(s,void 0,r,c)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(i=>i.hostUpdate?.()),this.update(t)):this._$EM()}catch(i){throw e=!1,this._$EM(),i}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(e){}firstUpdated(e){}};E.elementStyles=[],E.shadowRootOptions={mode:"open"},E[R("elementProperties")]=new Map,E[R("finalized")]=new Map,kt?.({ReactiveElement:E}),(se.reactiveElementVersions??=[]).push("2.1.2");const Ae=globalThis,ze=n=>n,G=Ae.trustedTypes,Be=G?G.createPolicy("lit-html",{createHTML:n=>n}):void 0,tt="$lit$",$=`lit$${Math.random().toFixed(9).slice(2)}$`,it="?"+$,At=`<${it}>`,S=document,N=()=>S.createComment(""),D=n=>n===null||typeof n!="object"&&typeof n!="function",Ce=Array.isArray,Ct=n=>Ce(n)||typeof n?.[Symbol.iterator]=="function",ae=`[ 	
+\f\r]`,T=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,Oe=/-->/g,Pe=/>/g,C=RegExp(`>|${ae}(?:([^\\s"'>=/]+)(${ae}*=${ae}*(?:[^ 	
+\f\r"'\`<>=]|("|')|))|$)`,"g"),Te=/'/g,Re=/"/g,st=/^(?:script|style|textarea|title)$/i,rt=n=>(e,...t)=>({_$litType$:n,strings:e,values:t}),o=rt(1),Ht=rt(2),z=Symbol.for("lit-noChange"),l=Symbol.for("lit-nothing"),Ne=new WeakMap,H=S.createTreeWalker(S,129);function nt(n,e){if(!Ce(n)||!n.hasOwnProperty("raw"))throw Error("invalid template strings array");return Be!==void 0?Be.createHTML(e):e}const St=(n,e)=>{const t=n.length-1,i=[];let s,r=e===2?"<svg>":e===3?"<math>":"",a=T;for(let c=0;c<t;c++){const h=n[c];let d,g,u=-1,_=0;for(;_<h.length&&(a.lastIndex=_,g=a.exec(h),g!==null);)_=a.lastIndex,a===T?g[1]==="!--"?a=Oe:g[1]!==void 0?a=Pe:g[2]!==void 0?(st.test(g[2])&&(s=RegExp("</"+g[2],"g")),a=C):g[3]!==void 0&&(a=C):a===C?g[0]===">"?(a=s??T,u=-1):g[1]===void 0?u=-2:(u=a.lastIndex-g[2].length,d=g[1],a=g[3]===void 0?C:g[3]==='"'?Re:Te):a===Re||a===Te?a=C:a===Oe||a===Pe?a=T:(a=C,s=void 0);const b=a===C&&n[c+1].startsWith("/>")?" ":"";r+=a===T?h+At:u>=0?(i.push(d),h.slice(0,u)+tt+h.slice(u)+$+b):h+$+(u===-2?c:b)}return[nt(n,r+(n[t]||"<?>")+(e===2?"</svg>":e===3?"</math>":"")),i]};class I{constructor({strings:e,_$litType$:t},i){let s;this.parts=[];let r=0,a=0;const c=e.length-1,h=this.parts,[d,g]=St(e,t);if(this.el=I.createElement(d,i),H.currentNode=this.el.content,t===2||t===3){const u=this.el.content.firstChild;u.replaceWith(...u.childNodes)}for(;(s=H.nextNode())!==null&&h.length<c;){if(s.nodeType===1){if(s.hasAttributes())for(const u of s.getAttributeNames())if(u.endsWith(tt)){const _=g[a++],b=s.getAttribute(u).split($),A=/([.?@])?(.*)/.exec(_);h.push({type:1,index:r,name:A[2],strings:b,ctor:A[1]==="."?Vt:A[1]==="?"?Mt:A[1]==="@"?Et:re}),s.removeAttribute(u)}else u.startsWith($)&&(h.push({type:6,index:r}),s.removeAttribute(u));if(st.test(s.tagName)){const u=s.textContent.split($),_=u.length-1;if(_>0){s.textContent=G?G.emptyScript:"";for(let b=0;b<_;b++)s.append(u[b],N()),H.nextNode(),h.push({type:2,index:++r});s.append(u[_],N())}}}else if(s.nodeType===8)if(s.data===it)h.push({type:2,index:r});else{let u=-1;for(;(u=s.data.indexOf($,u+1))!==-1;)h.push({type:7,index:r}),u+=$.length-1}r++}}static createElement(e,t){const i=S.createElement("template");return i.innerHTML=e,i}}function B(n,e,t=n,i){if(e===z)return e;let s=i!==void 0?t._$Co?.[i]:t._$Cl;const r=D(e)?void 0:e._$litDirective$;return s?.constructor!==r&&(s?._$AO?.(!1),r===void 0?s=void 0:(s=new r(n),s._$AT(n,t,i)),i!==void 0?(t._$Co??=[])[i]=s:t._$Cl=s),s!==void 0&&(e=B(n,s._$AS(n,e.values),s,i)),e}class Lt{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:i}=this._$AD,s=(e?.creationScope??S).importNode(t,!0);H.currentNode=s;let r=H.nextNode(),a=0,c=0,h=i[0];for(;h!==void 0;){if(a===h.index){let d;h.type===2?d=new U(r,r.nextSibling,this,e):h.type===1?d=new h.ctor(r,h.name,h.strings,this,e):h.type===6&&(d=new zt(r,this,e)),this._$AV.push(d),h=i[++c]}a!==h?.index&&(r=H.nextNode(),a++)}return H.currentNode=S,s}p(e){let t=0;for(const i of this._$AV)i!==void 0&&(i.strings!==void 0?(i._$AI(e,i,t),t+=i.strings.length-2):i._$AI(e[t])),t++}}class U{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,i,s){this.type=2,this._$AH=l,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=i,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return t!==void 0&&e?.nodeType===11&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=B(this,e,t),D(e)?e===l||e==null||e===""?(this._$AH!==l&&this._$AR(),this._$AH=l):e!==this._$AH&&e!==z&&this._(e):e._$litType$!==void 0?this.$(e):e.nodeType!==void 0?this.T(e):Ct(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==l&&D(this._$AH)?this._$AA.nextSibling.data=e:this.T(S.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:i}=e,s=typeof i=="number"?this._$AC(e):(i.el===void 0&&(i.el=I.createElement(nt(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===s)this._$AH.p(t);else{const r=new Lt(s,this),a=r.u(this.options);r.p(t),this.T(a),this._$AH=r}}_$AC(e){let t=Ne.get(e.strings);return t===void 0&&Ne.set(e.strings,t=new I(e)),t}k(e){Ce(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let i,s=0;for(const r of e)s===t.length?t.push(i=new U(this.O(N()),this.O(N()),this,this.options)):i=t[s],i._$AI(r),s++;s<t.length&&(this._$AR(i&&i._$AB.nextSibling,s),t.length=s)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const i=ze(e).nextSibling;ze(e).remove(),e=i}}setConnected(e){this._$AM===void 0&&(this._$Cv=e,this._$AP?.(e))}}class re{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,i,s,r){this.type=1,this._$AH=l,this._$AN=void 0,this.element=e,this.name=t,this._$AM=s,this.options=r,i.length>2||i[0]!==""||i[1]!==""?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=l}_$AI(e,t=this,i,s){const r=this.strings;let a=!1;if(r===void 0)e=B(this,e,t,0),a=!D(e)||e!==this._$AH&&e!==z,a&&(this._$AH=e);else{const c=e;let h,d;for(e=r[0],h=0;h<r.length-1;h++)d=B(this,c[i+h],t,h),d===z&&(d=this._$AH[h]),a||=!D(d)||d!==this._$AH[h],d===l?e=l:e!==l&&(e+=(d??"")+r[h+1]),this._$AH[h]=d}a&&!s&&this.j(e)}j(e){e===l?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class Vt extends re{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===l?void 0:e}}class Mt extends re{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==l)}}class Et extends re{constructor(e,t,i,s,r){super(e,t,i,s,r),this.type=5}_$AI(e,t=this){if((e=B(this,e,t,0)??l)===z)return;const i=this._$AH,s=e===l&&i!==l||e.capture!==i.capture||e.once!==i.once||e.passive!==i.passive,r=e!==l&&(i===l||s);s&&this.element.removeEventListener(this.name,this,i),r&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){typeof this._$AH=="function"?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class zt{constructor(e,t,i){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(e){B(this,e)}}const Bt=Ae.litHtmlPolyfillSupport;Bt?.(I,U),(Ae.litHtmlVersions??=[]).push("3.3.3");const Ot=(n,e,t)=>{const i=t?.renderBefore??e;let s=i._$litPart$;if(s===void 0){const r=t?.renderBefore??null;i._$litPart$=s=new U(e.insertBefore(N(),r),r,void 0,t??{})}return s._$AI(n),s};const He=globalThis;class f extends E{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=Ot(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return z}}f._$litElement$=!0,f.finalized=!0,He.litElementHydrateSupport?.({LitElement:f});const Pt=He.litElementPolyfillSupport;Pt?.({LitElement:f});(He.litElementVersions??=[]).push("4.2.2");var Tt="M16 17V19H2V17S2 13 9 13 16 17 16 17M12.5 7.5A3.5 3.5 0 1 0 9 11A3.5 3.5 0 0 0 12.5 7.5M15.94 13A5.32 5.32 0 0 1 18 17V19H22V17S22 13.37 15.94 13M15 4A3.39 3.39 0 0 0 13.07 4.59A5 5 0 0 1 13.07 10.41A3.39 3.39 0 0 0 15 11A3.5 3.5 0 0 0 15 4Z",Rt="M19,18.31V20A2,2 0 0,1 17,22H7A2,2 0 0,1 5,20V16.3C4.54,16.12 3.95,16 3,16A1,1 0 0,1 2,15A1,1 0 0,1 3,14C3.82,14 4.47,14.08 5,14.21V12.3C4.54,12.12 3.95,12 3,12A1,1 0 0,1 2,11A1,1 0 0,1 3,10C3.82,10 4.47,10.08 5,10.21V8.3C4.54,8.12 3.95,8 3,8A1,1 0 0,1 2,7A1,1 0 0,1 3,6C3.82,6 4.47,6.08 5,6.21V4A2,2 0 0,1 7,2H17A2,2 0 0,1 19,4V6.16C20.78,6.47 21.54,7.13 21.71,7.29C22.1,7.68 22.1,8.32 21.71,8.71C21.32,9.1 20.8,9.09 20.29,8.71V8.71C20.29,8.71 19.25,8 17,8C15.74,8 14.91,8.41 13.95,8.9C12.91,9.41 11.74,10 10,10C9.64,10 9.31,10 9,9.96V7.95C9.3,8 9.63,8 10,8C11.26,8 12.09,7.59 13.05,7.11C14.09,6.59 15.27,6 17,6V4H7V20H17V18C18.5,18 18.97,18.29 19,18.31M17,10C15.27,10 14.09,10.59 13.05,11.11C12.09,11.59 11.26,12 10,12C9.63,12 9.3,12 9,11.95V13.96C9.31,14 9.64,14 10,14C11.74,14 12.91,13.41 13.95,12.9C14.91,12.42 15.74,12 17,12C19.25,12 20.29,12.71 20.29,12.71V12.71C20.8,13.1 21.32,13.1 21.71,12.71C22.1,12.32 22.1,11.69 21.71,11.29C21.5,11.08 20.25,10 17,10M17,14C15.27,14 14.09,14.59 13.05,15.11C12.09,15.59 11.26,16 10,16C9.63,16 9.3,16 9,15.95V17.96C9.31,18 9.64,18 10,18C11.74,18 12.91,17.41 13.95,16.9C14.91,16.42 15.74,16 17,16C19.25,16 20.29,16.71 20.29,16.71V16.71C20.8,17.1 21.32,17.1 21.71,16.71C22.1,16.32 22.1,15.69 21.71,15.29C21.5,15.08 20.25,14 17,14Z",Nt="M6,6.9L3.87,4.78L5.28,3.37L7.4,5.5L6,6.9M13,1V4H11V1H13M20.13,4.78L18,6.9L16.6,5.5L18.72,3.37L20.13,4.78M4.5,10.5V12.5H1.5V10.5H4.5M19.5,10.5H22.5V12.5H19.5V10.5M6,20H18A2,2 0 0,1 20,22H4A2,2 0 0,1 6,20M12,5A6,6 0 0,1 18,11V19H6V11A6,6 0 0,1 12,5Z",Dt="M11,15H13V17H11V15M11,7H13V13H11V7M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20Z",at="M12,2L1,21H23M12,6L19.53,19H4.47M11,10V14H13V10M11,16V18H13V16",It="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z",ot="M20 19V3H4V19H2V21H22V19H20M16 9H18V11H16V9M14 11H6V9H14V11M18 7H16V5H18V7M14 5V7H6V5H14M6 19V13H14V14.82C13.55 15.14 13.25 15.66 13.25 16.25C13.25 17.22 14.03 18 15 18S16.75 17.22 16.75 16.25C16.75 15.66 16.45 15.13 16 14.82V13H18V19H6Z",Ut="M6.03 12.03L8.03 15.5L5.5 18.68L2 12.62L6.03 12.03M17 18V15.29C17.88 14.9 18.5 14.03 18.5 13C18.5 12.43 18.3 11.9 17.97 11.5L19.94 10.35C20.95 9.76 21.3 8.47 20.71 7.46L19.33 5.06C18.74 4.05 17.45 3.7 16.44 4.28L8.31 9C7.36 9.53 7.03 10.75 7.58 11.71L9.08 14.31C9.63 15.26 10.86 15.59 11.81 15.04L13.69 13.96C13.94 14.55 14.41 15.03 15 15.29V18C15 19.1 15.9 20 17 20H22V18H17Z",Kt="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z",Ft="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M10 17L5 12L6.41 10.59L10 14.17L17.59 6.58L19 8L10 17Z",Zt="M20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4C12.76,4 13.5,4.11 14.2,4.31L15.77,2.74C14.61,2.26 13.34,2 12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12M7.91,10.08L6.5,11.5L11,16L21,6L19.59,4.58L11,13.17L7.91,10.08Z",qt="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z",De="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z",q="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z",K="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z",Ie="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z",Ue="M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19M8,9H16V19H8V9M15.5,4L14.5,3H9.5L8.5,4H5V6H19V4H15.5Z",jt="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z",Gt="M12,11A1,1 0 0,0 11,12A1,1 0 0,0 12,13A1,1 0 0,0 13,12A1,1 0 0,0 12,11M12.5,2C17,2 17.11,5.57 14.75,6.75C13.76,7.24 13.32,8.29 13.13,9.22C13.61,9.42 14.03,9.73 14.35,10.13C18.05,8.13 22.03,8.92 22.03,12.5C22.03,17 18.46,17.1 17.28,14.73C16.78,13.74 15.72,13.3 14.79,13.11C14.59,13.59 14.28,14 13.88,14.34C15.87,18.03 15.08,22 11.5,22C7,22 6.91,18.42 9.27,17.24C10.25,16.75 10.69,15.71 10.89,14.79C10.4,14.59 9.97,14.27 9.65,13.87C5.96,15.85 2,15.07 2,11.5C2,7 5.56,6.89 6.74,9.26C7.24,10.25 8.29,10.68 9.22,10.87C9.41,10.39 9.73,9.97 10.14,9.65C8.15,5.96 8.94,2 12.5,2Z",Wt="M7,5H21V7H7V5M7,13V11H21V13H7M4,4.5A1.5,1.5 0 0,1 5.5,6A1.5,1.5 0 0,1 4,7.5A1.5,1.5 0 0,1 2.5,6A1.5,1.5 0 0,1 4,4.5M4,10.5A1.5,1.5 0 0,1 5.5,12A1.5,1.5 0 0,1 4,13.5A1.5,1.5 0 0,1 2.5,12A1.5,1.5 0 0,1 4,10.5M7,19V17H21V19H7M4,16.5A1.5,1.5 0 0,1 5.5,18A1.5,1.5 0 0,1 4,19.5A1.5,1.5 0 0,1 2.5,18A1.5,1.5 0 0,1 4,16.5Z",dt="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12C20,14.4 19,16.5 17.3,18C15.9,16.7 14,16 12,16C10,16 8.2,16.7 6.7,18C5,16.5 4,14.4 4,12A8,8 0 0,1 12,4M14,5.89C13.62,5.9 13.26,6.15 13.1,6.54L11.81,9.77L11.71,10C11,10.13 10.41,10.6 10.14,11.26C9.73,12.29 10.23,13.45 11.26,13.86C12.29,14.27 13.45,13.77 13.86,12.74C14.12,12.08 14,11.32 13.57,10.76L13.67,10.5L14.96,7.29L14.97,7.26C15.17,6.75 14.92,6.17 14.41,5.96C14.28,5.91 14.15,5.89 14,5.89M10,6A1,1 0 0,0 9,7A1,1 0 0,0 10,8A1,1 0 0,0 11,7A1,1 0 0,0 10,6M7,9A1,1 0 0,0 6,10A1,1 0 0,0 7,11A1,1 0 0,0 8,10A1,1 0 0,0 7,9M17,9A1,1 0 0,0 16,10A1,1 0 0,0 17,11A1,1 0 0,0 18,10A1,1 0 0,0 17,9Z",he="M12,3L2,12H5V20H19V12H22L12,3M12,8.5C14.34,8.5 16.46,9.43 18,10.94L16.8,12.12C15.58,10.91 13.88,10.17 12,10.17C10.12,10.17 8.42,10.91 7.2,12.12L6,10.94C7.54,9.43 9.66,8.5 12,8.5M12,11.83C13.4,11.83 14.67,12.39 15.6,13.3L14.4,14.47C13.79,13.87 12.94,13.5 12,13.5C11.06,13.5 10.21,13.87 9.6,14.47L8.4,13.3C9.33,12.39 10.6,11.83 12,11.83M12,15.17C12.94,15.17 13.7,15.91 13.7,16.83C13.7,17.75 12.94,18.5 12,18.5C11.06,18.5 10.3,17.75 10.3,16.83C10.3,15.91 11.06,15.17 12,15.17Z",W="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z",ct="M12,2A7,7 0 0,0 5,9C5,11.38 6.19,13.47 8,14.74V17A1,1 0 0,0 9,18H15A1,1 0 0,0 16,17V14.74C17.81,13.47 19,11.38 19,9A7,7 0 0,0 12,2M9,21A1,1 0 0,0 10,22H14A1,1 0 0,0 15,21V20H9V21Z",Ke="M2,5.27L3.28,4L20,20.72L18.73,22L13.9,17.17L11.29,19.78C9.34,21.73 6.17,21.73 4.22,19.78C2.27,17.83 2.27,14.66 4.22,12.71L5.71,11.22C5.7,12.04 5.83,12.86 6.11,13.65L5.64,14.12C4.46,15.29 4.46,17.19 5.64,18.36C6.81,19.54 8.71,19.54 9.88,18.36L12.5,15.76L10.88,14.15C10.87,14.39 10.77,14.64 10.59,14.83C10.2,15.22 9.56,15.22 9.17,14.83C8.12,13.77 7.63,12.37 7.72,11L2,5.27M12.71,4.22C14.66,2.27 17.83,2.27 19.78,4.22C21.73,6.17 21.73,9.34 19.78,11.29L18.29,12.78C18.3,11.96 18.17,11.14 17.89,10.36L18.36,9.88C19.54,8.71 19.54,6.81 18.36,5.64C17.19,4.46 15.29,4.46 14.12,5.64L10.79,8.97L9.38,7.55L12.71,4.22M13.41,9.17C13.8,8.78 14.44,8.78 14.83,9.17C16.2,10.54 16.61,12.5 16.06,14.23L14.28,12.46C14.23,11.78 13.94,11.11 13.41,10.59C13,10.2 13,9.56 13.41,9.17Z",lt="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z",pe="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z",Yt="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z",Jt="M12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2C17.5,2 22,6 22,11A6,6 0 0,1 16,17H14.2C13.9,17 13.7,17.2 13.7,17.5C13.7,17.6 13.8,17.7 13.8,17.8C14.2,18.3 14.4,18.9 14.4,19.5C14.5,20.9 13.4,22 12,22M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C12.3,20 12.5,19.8 12.5,19.5C12.5,19.3 12.4,19.2 12.4,19.1C12,18.6 11.8,18.1 11.8,17.5C11.8,16.1 12.9,15 14.3,15H16A4,4 0 0,0 20,11C20,7.1 16.4,4 12,4M6.5,10C7.3,10 8,10.7 8,11.5C8,12.3 7.3,13 6.5,13C5.7,13 5,12.3 5,11.5C5,10.7 5.7,10 6.5,10M9.5,6C10.3,6 11,6.7 11,7.5C11,8.3 10.3,9 9.5,9C8.7,9 8,8.3 8,7.5C8,6.7 8.7,6 9.5,6M14.5,6C15.3,6 16,6.7 16,7.5C16,8.3 15.3,9 14.5,9C13.7,9 13,8.3 13,7.5C13,6.7 13.7,6 14.5,6M17.5,10C18.3,10 19,10.7 19,11.5C19,12.3 18.3,13 17.5,13C16.7,13 16,12.3 16,11.5C16,10.7 16.7,10 17.5,10Z",F="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z",Qt="M4,4H10V10H4V4M20,4V10H14V4H20M14,15H16V13H14V11H16V13H18V11H20V13H18V15H20V18H18V20H16V18H13V20H11V16H14V15M16,15V18H18V15H16M4,20V14H10V20H4M6,6V8H8V6H6M16,6V8H18V6H16M6,16V18H8V16H6M4,11H6V13H4V11M9,11H13V15H11V13H9V11M11,6H13V10H11V6M2,2V6H0V2A2,2 0 0,1 2,0H6V2H2M22,0A2,2 0 0,1 24,2V6H22V2H18V0H22M2,18V22H6V24H2A2,2 0 0,1 0,22V18H2M22,22V18H24V22A2,2 0 0,1 22,24H18V22H22Z",Xt="M17.65,6.35C16.2,4.9 14.21,4 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20C15.73,20 18.84,17.45 19.73,14H17.65C16.83,16.33 14.61,18 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6C13.66,6 15.14,6.69 16.22,7.78L13,11H20V4L17.65,6.35Z",ei="M9,2C7.89,2 7,2.89 7,4V20C7,21.11 7.89,22 9,22H15C16.11,22 17,21.11 17,20V4C17,2.89 16.11,2 15,2H13V4H11V2H9M11,6H13V8H15V10H13V12H11V10H9V8H11V6M9,14H11V16H9V14M13,14H15V16H13V14M9,18H11V20H9V18M13,18H15V20H13V18Z",Fe="M12,4C14.1,4 16.1,4.8 17.6,6.3C20.7,9.4 20.7,14.5 17.6,17.6C15.8,19.5 13.3,20.2 10.9,19.9L11.4,17.9C13.1,18.1 14.9,17.5 16.2,16.2C18.5,13.9 18.5,10.1 16.2,7.7C15.1,6.6 13.5,6 12,6V10.6L7,5.6L12,0.6V4M6.3,17.6C3.7,15 3.3,11 5.1,7.9L6.6,9.4C5.5,11.6 5.9,14.4 7.8,16.2C8.3,16.7 8.9,17.1 9.6,17.4L9,19.4C8,19 7.1,18.4 6.3,17.6Z",ht="M12,2C14.65,2 17.19,3.06 19.07,4.93L17.65,6.35C16.15,4.85 14.12,4 12,4C9.88,4 7.84,4.84 6.35,6.35L4.93,4.93C6.81,3.06 9.35,2 12,2M3.66,6.5L5.11,7.94C4.39,9.17 4,10.57 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12C20,10.57 19.61,9.17 18.88,7.94L20.34,6.5C21.42,8.12 22,10.04 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12C2,10.04 2.58,8.12 3.66,6.5M12,6A6,6 0 0,1 18,12C18,13.59 17.37,15.12 16.24,16.24L14.83,14.83C14.08,15.58 13.06,16 12,16C10.94,16 9.92,15.58 9.17,14.83L7.76,16.24C6.63,15.12 6,13.59 6,12A6,6 0 0,1 12,6M12,8A1,1 0 0,0 11,9A1,1 0 0,0 12,10A1,1 0 0,0 13,9A1,1 0 0,0 12,8Z",Ze="M21,11C21,16.55 17.16,21.74 12,23C6.84,21.74 3,16.55 3,11V5L12,1L21,5V11M12,21C15.75,20 19,15.54 19,11.22V6.3L12,3.18L5,6.3V11.22C5,15.54 8.25,20 12,21M10,17L6,13L7.41,11.59L10,14.17L16.59,7.58L18,9",ti="M12,15.39L8.24,17.66L9.23,13.38L5.91,10.5L10.29,10.13L12,6.09L13.71,10.13L18.09,10.5L14.77,13.38L15.76,17.66M22,9.24L14.81,8.63L12,2L9.19,8.63L2,9.24L7.45,13.97L5.82,21L12,17.27L18.18,21L16.54,13.97L22,9.24Z",v="M21,17H3V5H21M21,3H3A2,2 0 0,0 1,5V17A2,2 0 0,0 3,19H8V21H16V19H21A2,2 0 0,0 23,17V5A2,2 0 0,0 21,3Z",pt="M15 13V5A3 3 0 0 0 9 5V13A5 5 0 1 0 15 13M12 4A1 1 0 0 1 13 5V8H11V5A1 1 0 0 1 12 4Z",ge="M17 6H7C3.69 6 1 8.69 1 12S3.69 18 7 18H17C20.31 18 23 15.31 23 12S20.31 6 17 6M17 16H7C4.79 16 3 14.21 3 12S4.79 8 7 8H17C19.21 8 21 9.79 21 12S19.21 16 17 16M17 9C15.34 9 14 10.34 14 12S15.34 15 17 15 20 13.66 20 12 18.66 9 17 9Z",qe="M8 13C6.14 13 4.59 14.28 4.14 16H2V18H4.14C4.59 19.72 6.14 21 8 21S11.41 19.72 11.86 18H22V16H11.86C11.41 14.28 9.86 13 8 13M8 19C6.9 19 6 18.1 6 17C6 15.9 6.9 15 8 15S10 15.9 10 17C10 18.1 9.1 19 8 19M19.86 6C19.41 4.28 17.86 3 16 3S12.59 4.28 12.14 6H2V8H12.14C12.59 9.72 14.14 11 16 11S19.41 9.72 19.86 8H22V6H19.86M16 9C14.9 9 14 8.1 14 7C14 5.9 14.9 5 16 5S18 5.9 18 7C18 8.1 17.1 9 16 9Z",je="M19,14.5C19,14.5 21,16.67 21,18A2,2 0 0,1 19,20A2,2 0 0,1 17,18C17,16.67 19,14.5 19,14.5M5,18V9A2,2 0 0,1 3,7A2,2 0 0,1 5,5V4A2,2 0 0,1 7,2H9A2,2 0 0,1 11,4V5H19A2,2 0 0,1 21,7V9L21,11A1,1 0 0,1 22,12A1,1 0 0,1 21,13H17A1,1 0 0,1 16,12A1,1 0 0,1 17,11V9H11V18H12A2,2 0 0,1 14,20V22H2V20A2,2 0 0,1 4,18H5Z";const k="homekit_manager/",oe=n=>n.callWS({type:k+"bridges"}).then(e=>e.bridges),Ge=n=>n.callWS({type:k+"entities"}),ii=(n,e)=>n.callWS({type:k+"pairing",entry_id:e}),si=(n,e)=>n.callWS({type:k+"bridge/create",name:e}).then(t=>t.bridge),ri=(n,e,t,i)=>n.callWS({type:k+"accessory/create",entity_id:e,name:t,remove_from_bridges:i}).then(s=>s.bridge),ni=(n,e,t)=>n.callWS({type:k+"bridge/settings",entry_id:e,...t}).then(i=>i.bridge),ai=(n,e,t,i)=>n.callWS({type:k+"bridge/assign",entry_id:e,entities:t,entity_config:i}).then(s=>s.bridge),ne=n=>(e,t)=>e.callWS({type:k+n,entry_id:t}).then(i=>i.bridge),oi=ne("bridge/adopt"),di=ne("bridge/restart"),ci=ne("bridge/unpair"),li=ne("bridge/delete"),de=n=>{if(n&&typeof n=="object"){const e=n;return e.message||e.error?.message||e.code||String(n)}return String(n)},ue=[{id:"light",label:"cat_light",icon:ct,domains:["light"]},{id:"switch",label:"cat_switch",icon:ge,domains:["switch","input_boolean"]},{id:"climate",label:"cat_climate",icon:pt,domains:["climate","fan","humidifier","water_heater"]},{id:"cover",label:"cat_cover",icon:ot,domains:["cover","valve"]},{id:"sensor",label:"cat_sensor",icon:dt,domains:["sensor","binary_sensor"]},{id:"security",label:"cat_security",icon:lt,domains:["alarm_control_panel","lock","camera"]},{id:"media",label:"cat_media",icon:v,domains:["media_player","remote"]},{id:"scene",label:"cat_scene",icon:Jt,domains:["scene","script","automation","button","input_button"]},{id:"select",label:"cat_select",icon:Wt,domains:["select","input_select"]},{id:"appliance",label:"cat_appliance",icon:ht,domains:["vacuum","lawn_mower"]},{id:"presence",label:"cat_presence",icon:Tt,domains:["person","device_tracker"]}],hi={id:"other",label:"cat_other",icon:jt,domains:[]},gt=new Map;for(const n of ue)for(const e of n.domains)gt.set(e,n);const j=n=>gt.get(n)??hi,pi={light:ct,switch:ge,input_boolean:ge,climate:pt,fan:Gt,humidifier:Rt,water_heater:je,cover:ot,valve:je,sensor:dt,binary_sensor:Zt,alarm_control_panel:Nt,lock:lt,camera:Ut,media_player:v,remote:ei,vacuum:ht},Se=n=>pi[n]??j(n).icon,gi={SecuritySystem:{de:"Alarmanlage",en:"Security system"},BinarySensor:{de:"Sensor",en:"Sensor"},Thermostat:{de:"Thermostat",en:"Thermostat"},HeaterCooler:{de:"Heiz-/Kühlgerät",en:"Heater/cooler"},OzoneSensor:{de:"Luftqualität (O₃)",en:"Air quality (O₃)"},SulphurDioxideSensor:{de:"Luftqualität (SO₂)",en:"Air quality (SO₂)"},GarageDoorOpener:{de:"Garagentor",en:"Garage door"},Window:{de:"Fenster",en:"Window"},Door:{de:"Tür",en:"Door"},WindowCovering:{de:"Rollladen",en:"Window covering"},WindowCoveringBasic:{de:"Rollladen",en:"Window covering"},Fan:{de:"Ventilator",en:"Fan"},AirPurifier:{de:"Luftreiniger",en:"Air purifier"},HumidifierDehumidifier:{de:"Luftbefeuchter",en:"Humidifier"},Light:{de:"Licht",en:"Light"},Lock:{de:"Schloss",en:"Lock"},ReceiverMediaPlayer:{de:"Receiver",en:"Receiver"},TelevisionMediaPlayer:{de:"Fernseher",en:"Television"},MediaPlayer:{de:"Mediaplayer",en:"Media player"},TemperatureSensor:{de:"Temperatur",en:"Temperature"},HumiditySensor:{de:"Luftfeuchtigkeit",en:"Humidity"},PM10Sensor:{de:"Luftqualität (PM10)",en:"Air quality (PM10)"},PM25Sensor:{de:"Luftqualität (PM2.5)",en:"Air quality (PM2.5)"},NitrogenDioxideSensor:{de:"Luftqualität (NO₂)",en:"Air quality (NO₂)"},VolatileOrganicCompoundsSensor:{de:"Luftqualität (VOC)",en:"Air quality (VOC)"},AirQualitySensor:{de:"Luftqualität",en:"Air quality"},CarbonMonoxideSensor:{de:"Kohlenmonoxid",en:"Carbon monoxide"},CarbonDioxideSensor:{de:"CO₂",en:"CO₂"},LightSensor:{de:"Helligkeit",en:"Light level"},Switch:{de:"Schalter",en:"Switch"},Outlet:{de:"Steckdose",en:"Outlet"},ValveSwitch:{de:"Ventil",en:"Valve"},Valve:{de:"Ventil",en:"Valve"},Vacuum:{de:"Saugroboter",en:"Vacuum"},LawnMower:{de:"Mähroboter",en:"Lawn mower"},ActivityRemote:{de:"Fernbedienung",en:"Remote"},SelectSwitch:{de:"Auswahlschalter",en:"Select switch"},WaterHeater:{de:"Warmwasser",en:"Water heater"},Camera:{de:"Kamera",en:"Camera"}},We={motion:{de:"Bewegungsmelder",en:"Motion sensor"},occupancy:{de:"Präsenzmelder",en:"Occupancy sensor"},presence:{de:"Präsenzmelder",en:"Occupancy sensor"},door:{de:"Kontaktsensor",en:"Contact sensor"},garage_door:{de:"Kontaktsensor",en:"Contact sensor"},opening:{de:"Kontaktsensor",en:"Contact sensor"},window:{de:"Kontaktsensor",en:"Contact sensor"},smoke:{de:"Rauchmelder",en:"Smoke detector"},moisture:{de:"Wassersensor",en:"Leak sensor"},carbon_monoxide:{de:"CO-Melder",en:"CO detector"},gas:{de:"CO-Melder",en:"CO detector"}},ui={switch:{de:"Schalter",en:"Switch"},outlet:{de:"Steckdose",en:"Outlet"},valve:{de:"Ventil",en:"Valve"},faucet:{de:"Wasserhahn",en:"Faucet"},shower:{de:"Dusche",en:"Shower"},sprinkler:{de:"Bewässerung",en:"Sprinkler"},fan:{de:"Ventilator",en:"Fan"},air_purifier:{de:"Luftreiniger",en:"Air purifier"},thermostat:{de:"Thermostat",en:"Thermostat"},heater_cooler:{de:"Heiz-/Kühlgerät (Klimaanlage)",en:"Heater/cooler (AC)"}},me=(n,e,t)=>n?e?n.de:n.en:t,mi=(n,e)=>me(ui[n],e,n),O=(n,e,t,i)=>{if(!n)return null;if(n==="BinarySensor"){if(e==="person"||e==="device_tracker")return i?"Anwesenheit":"Presence";if(t&&We[t])return me(We[t],i,n)}return me(gi[n],i,n)},ut=(n,e)=>e?n==="switch"?e==="outlet"?"Outlet":e==="switch"?"Switch":"ValveSwitch":n==="fan"?e==="air_purifier"?"AirPurifier":"Fan":n==="climate"?e==="heater_cooler"?"HeaterCooler":"Thermostat":null:null,L=y`
+  :host {
+    --hkm-primary: var(--primary-color, #03a9f4);
+    --hkm-on-primary: var(--text-primary-color, #fff);
+    --hkm-bg: var(--primary-background-color, #f6f7f9);
+    --hkm-card: var(--card-background-color, var(--ha-card-background, #fff));
+    --hkm-text: var(--primary-text-color, #1c1c1e);
+    --hkm-text-2: var(--secondary-text-color, #6b7280);
+    --hkm-divider: var(--divider-color, rgba(0, 0, 0, 0.12));
+    --hkm-success: var(--success-color, #2e9d5b);
+    --hkm-warning: var(--warning-color, #e8a317);
+    --hkm-error: var(--error-color, #db4437);
+    --hkm-radius: var(--ha-card-border-radius, 16px);
+    --hkm-radius-s: 10px;
+    --hkm-shadow: var(
+      --ha-card-box-shadow,
+      0 1px 2px rgba(0, 0, 0, 0.06),
+      0 2px 8px rgba(0, 0, 0, 0.04)
+    );
+    --hkm-tint: color-mix(in srgb, var(--hkm-primary) 12%, transparent);
+    --hkm-tint-strong: color-mix(in srgb, var(--hkm-primary) 22%, transparent);
+    --hkm-surface-2: color-mix(in srgb, var(--hkm-text) 4%, var(--hkm-card));
+    --hkm-surface-3: color-mix(in srgb, var(--hkm-text) 8%, var(--hkm-card));
+  }
+`,V=y`
+  button {
+    font: inherit;
+    color: inherit;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--hkm-primary);
+    font-weight: 500;
+    font-size: 14px;
+    letter-spacing: 0.01em;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  }
+  .btn svg {
+    width: 18px;
+    height: 18px;
+    fill: currentColor;
+    flex: none;
+  }
+  .btn:hover {
+    background: var(--hkm-tint);
+  }
+  .btn:focus-visible {
+    outline: 2px solid var(--hkm-primary);
+    outline-offset: 2px;
+  }
+  .btn[disabled] {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+  .btn.filled {
+    background: var(--hkm-primary);
+    color: var(--hkm-on-primary);
+    box-shadow: 0 1px 3px color-mix(in srgb, var(--hkm-primary) 40%, transparent);
+  }
+  .btn.filled:hover {
+    background: color-mix(in srgb, var(--hkm-primary) 88%, black);
+  }
+  .btn.tonal {
+    background: var(--hkm-tint);
+  }
+  .btn.tonal:hover {
+    background: var(--hkm-tint-strong);
+  }
+  .btn.outlined {
+    border-color: var(--hkm-divider);
+    color: var(--hkm-text);
+  }
+  .btn.outlined:hover {
+    background: var(--hkm-surface-2);
+  }
+  .btn.danger {
+    color: var(--hkm-error);
+  }
+  .btn.danger:hover {
+    background: color-mix(in srgb, var(--hkm-error) 10%, transparent);
+  }
+  .btn.filled.danger {
+    background: var(--hkm-error);
+    color: #fff;
+  }
+  .btn.small {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+  }
+  .icon-btn:hover {
+    background: var(--hkm-surface-3);
+  }
+  .icon-btn svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+  }
+
+  /* Toggle switch */
+  .switch {
+    position: relative;
+    flex: none;
+    width: 46px;
+    height: 28px;
+    border-radius: 999px;
+    border: none;
+    padding: 0;
+    background: var(--hkm-surface-3);
+    box-shadow: inset 0 0 0 1px var(--hkm-divider);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  .switch::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s cubic-bezier(0.3, 0.7, 0.4, 1.2);
+  }
+  .switch[aria-checked="true"] {
+    background: var(--hkm-primary);
+    box-shadow: none;
+  }
+  .switch[aria-checked="true"]::after {
+    transform: translateX(18px);
+  }
+  .switch:focus-visible {
+    outline: 2px solid var(--hkm-primary);
+    outline-offset: 2px;
+  }
+  .switch[disabled] {
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  /* Text fields */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .field label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--hkm-text-2);
+  }
+  .field input,
+  .field select {
+    font: inherit;
+    font-size: 15px;
+    height: 44px;
+    padding: 0 14px;
+    border-radius: var(--hkm-radius-s);
+    border: 1px solid var(--hkm-divider);
+    background: var(--hkm-surface-2);
+    color: var(--hkm-text);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .field input:focus,
+  .field select:focus {
+    border-color: var(--hkm-primary);
+    box-shadow: 0 0 0 3px var(--hkm-tint);
+  }
+  .field .helper {
+    font-size: 12px;
+    color: var(--hkm-text-2);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--hkm-divider);
+    background: var(--hkm-card);
+    color: var(--hkm-text);
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+  .chip svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+  .chip:hover {
+    background: var(--hkm-surface-2);
+  }
+  .chip[aria-pressed="true"] {
+    background: var(--hkm-tint);
+    border-color: transparent;
+    color: var(--hkm-primary);
+    font-weight: 500;
+  }
+  .chip .count {
+    font-variant-numeric: tabular-nums;
+    color: var(--hkm-text-2);
+    font-size: 12px;
+  }
+  .chip[aria-pressed="true"] .count {
+    color: inherit;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    height: 20px;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    background: var(--hkm-surface-3);
+    color: var(--hkm-text-2);
+  }
+  .badge svg {
+    width: 13px;
+    height: 13px;
+    fill: currentColor;
+  }
+  .badge.primary {
+    background: var(--hkm-tint);
+    color: var(--hkm-primary);
+  }
+  .badge.success {
+    background: color-mix(in srgb, var(--hkm-success) 14%, transparent);
+    color: var(--hkm-success);
+  }
+  .badge.warning {
+    background: color-mix(in srgb, var(--hkm-warning) 18%, transparent);
+    color: color-mix(in srgb, var(--hkm-warning) 70%, var(--hkm-text));
+  }
+  .badge.error {
+    background: color-mix(in srgb, var(--hkm-error) 12%, transparent);
+    color: var(--hkm-error);
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2.5px solid var(--hkm-tint-strong);
+    border-top-color: var(--hkm-primary);
+    animation: hkm-spin 0.8s linear infinite;
+    flex: none;
+  }
+  @keyframes hkm-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+`,p=(n,e="")=>o`<svg class=${e} viewBox="0 0 24 24" aria-hidden="true">${Ht`<path d=${n}></path>`}</svg>`,w=(n,e,t)=>n.dispatchEvent(new CustomEvent(e,{detail:t,bubbles:!0,composed:!0})),Y=class Y extends f{firstUpdated(){const e=this.renderRoot.querySelector("dialog");e.showModal(),e.addEventListener("close",()=>w(this,"closed")),e.addEventListener("click",t=>{t.target===e&&e.close()})}close(){this.renderRoot.querySelector("dialog")?.close()}render(){return o`
+      <dialog class=${this.wide?"wide":""} aria-label=${this.heading}>
+        <div class="surface">
+          <header>
+            <slot name="icon"></slot>
+            <h2>${this.heading}</h2>
+            <button class="icon-btn" @click=${this.close} aria-label="close">
+              ${p(q)}
+            </button>
+          </header>
+          <div class="content"><slot></slot></div>
+          <footer><slot name="actions"></slot></footer>
+        </div>
+      </dialog>
+    `}};Y.properties={heading:{type:String},wide:{type:Boolean}},Y.styles=[L,V,y`
+      dialog {
+        padding: 0;
+        border: none;
+        background: transparent;
+        max-width: min(480px, calc(100vw - 24px));
+        width: 100%;
+        max-height: calc(100vh - 32px);
+        overflow: visible;
+        color: var(--hkm-text);
+      }
+      dialog.wide {
+        max-width: min(560px, calc(100vw - 24px));
+      }
+      dialog::backdrop {
+        background: rgba(10, 12, 16, 0.45);
+        backdrop-filter: blur(3px);
+      }
+      dialog[open] .surface {
+        animation: pop 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: translateY(8px) scale(0.98);
+        }
+      }
+      .surface {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 32px);
+        background: var(--hkm-card);
+        border-radius: 24px;
+        box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28);
+        overflow: hidden;
+      }
+      header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 12px 8px 24px;
+      }
+      h2 {
+        flex: 1;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.3;
+        overflow-wrap: anywhere;
+      }
+      .content {
+        padding: 8px 24px 8px;
+        overflow-y: auto;
+      }
+      footer {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 16px 24px 20px;
+      }
+    `];let _e=Y;const J=class J extends f{_confirm(){w(this,"confirm"),this.renderRoot.querySelector("hkm-dialog")?.close()}render(){return o`
+      <hkm-dialog .heading=${this.heading}>
+        <p>${this.text}</p>
+        <button
+          slot="actions"
+          class="btn outlined"
+          @click=${()=>this.renderRoot.querySelector("hkm-dialog")?.close()}
+        >
+          ${this.cancelLabel}
+        </button>
+        <button
+          slot="actions"
+          class="btn filled ${this.danger?"danger":""}"
+          @click=${this._confirm}
+        >
+          ${this.confirmLabel}
+        </button>
+      </hkm-dialog>
+    `}};J.properties={heading:{type:String},text:{type:String},confirmLabel:{type:String},cancelLabel:{type:String},danger:{type:Boolean}},J.styles=[L,V,y`
+      p {
+        margin: 0;
+        line-height: 1.55;
+        color: var(--hkm-text-2);
+      }
+    `];let fe=J;const Q=class Q extends f{constructor(){super(),this._error=null}_submit(e){e.preventDefault();const t=this.renderRoot.querySelector("form"),i=new FormData(t),s=String(i.get("name")||"").trim();if(s.length<3||s.length>25){this._error=this.t("bridge_name_helper");return}const r={name:s};if(this.mode==="settings"){const a=Number(i.get("port"));if(!Number.isInteger(a)||a<1024||a>65535){this._error="Port 1024–65535";return}r.port=a}w(this,"submit-form",r),this.renderRoot.querySelector("hkm-dialog")?.close()}render(){const e=this.t;return o`
+      <hkm-dialog .heading=${e(this.mode==="create"?"create_title":"settings_title")}>
+        <form @submit=${this._submit}>
+          ${this.mode==="create"?o`<p class="intro">${e("create_text")}</p>`:l}
+          <div class="field">
+            <label for="name">${e("bridge_name")}</label>
+            <input
+              id="name"
+              name="name"
+              .value=${this.name??""}
+              minlength="3"
+              maxlength="25"
+              required
+              autocomplete="off"
+              autofocus
+            />
+            <span class="helper">${e("bridge_name_helper")}</span>
+          </div>
+          ${this.mode==="settings"?o`<div class="field">
+                <label for="port">${e("bridge_port")}</label>
+                <input
+                  id="port"
+                  name="port"
+                  type="number"
+                  min="1024"
+                  max="65535"
+                  .value=${String(this.port??"")}
+                  required
+                />
+                <span class="helper">${e("bridge_port_helper")}</span>
+              </div>`:l}
+          ${this._error?o`<div class="error">${this._error}</div>`:l}
+          <button type="submit" hidden></button>
+        </form>
+        <button
+          slot="actions"
+          class="btn outlined"
+          @click=${()=>this.renderRoot.querySelector("hkm-dialog")?.close()}
+        >
+          ${e("cancel")}
+        </button>
+        <button slot="actions" class="btn filled" @click=${this._submit}>
+          ${e(this.mode==="create"?"create":"save")}
+        </button>
+      </hkm-dialog>
+    `}};Q.properties={t:{attribute:!1},mode:{type:String},name:{type:String},port:{type:Number},_error:{state:!0}},Q.styles=[L,V,y`
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .intro {
+        margin: 0;
+        color: var(--hkm-text-2);
+        line-height: 1.5;
+      }
+      .error {
+        color: var(--hkm-error);
+        font-size: 13px;
+      }
+    `];let be=Q;const X=class X extends f{constructor(){super(...arguments),this._makeAccessory=()=>{w(this,"make-accessory",{entityId:this.entity.entity_id}),this.renderRoot.querySelector("hkm-dialog")?.close()}}willUpdate(e){(e.has("entity")||e.has("options")||e.has("assigned"))&&(this._assigned=this.assigned,this._name=this.options?.name??"",this._type=this.options?.type??"")}_save(){w(this,"save-entity",{entityId:this.entity.entity_id,assigned:this._assigned,options:{name:this._name.trim()||null,type:this._type||null}}),this.renderRoot.querySelector("hkm-dialog")?.close()}_moreInfo(){const e=this.entity.entity_id;this.renderRoot.querySelector("hkm-dialog")?.close(),w(this,"hass-more-info",{entityId:e})}_stateIcon(e){return e&&customElements.get("ha-state-icon")?o`<ha-state-icon .hass=${this.hass} .stateObj=${e}></ha-state-icon>`:p(Se(this.entity.domain))}render(){const e=this.t,t=this.entity,i=this.hass.states[t.entity_id],s=ut(t.domain,this._type)??t.accessory_type,r=O(s,t.domain,t.device_class,this.german),a=O(t.accessory_type,t.domain,t.device_class,this.german),c=i?this.hass.formatEntityState?.(i)??i.state:"—",h=(this.options?.type??"")!==this._type&&this.assigned;return o`
+      <hkm-dialog .heading=${t.name} wide>
+        <div slot="icon" class="hero-icon ${this._assigned?"on":""}">
+          ${this._stateIcon(i)}
+        </div>
+
+        <div class="assign" @click=${()=>this._assigned=!this._assigned}>
+          <div>
+            <div class="assign-title">${e("entity_in_bridge")}</div>
+            <div class="mono">${t.entity_id}</div>
+          </div>
+          <button
+            class="switch"
+            role="switch"
+            aria-checked=${String(this._assigned)}
+            aria-label=${e("entity_in_bridge")}
+          ></button>
+        </div>
+
+        ${t.supported?l:o`<div class="note warning">${p(at)}<span>${e("warn_unsupported")}</span></div>`}
+        ${t.needs_accessory_mode?o`<div class="note info">
+              ${p(W)}
+              <div>
+                <span>${e("warn_accessory_mode")}</span>
+                ${this.canBeAccessory?o`<button class="btn small tonal note-action" @click=${this._makeAccessory}>
+                      ${p(v)} ${e("make_accessory")}
+                    </button>`:l}
+              </div>
+            </div>`:l}
+
+        <div class="form">
+          <div class="field">
+            <label for="hk-name">${e("homekit_name")}</label>
+            <input
+              id="hk-name"
+              .value=${this._name}
+              placeholder=${t.name}
+              maxlength="64"
+              autocomplete="off"
+              @input=${d=>this._name=d.target.value}
+            />
+            <span class="helper">${e("homekit_name_helper")}</span>
+          </div>
+          ${this.typeOptions?.length?o`<div class="field">
+                <label for="hk-type">${e("accessory_type")}</label>
+                <select
+                  id="hk-type"
+                  @change=${d=>this._type=d.target.value}
+                >
+                  <option value="" ?selected=${!this._type}>
+                    ${e("accessory_type_auto",{type:a??"—"})}
+                  </option>
+                  ${this.typeOptions.map(d=>o`<option value=${d} ?selected=${this._type===d}>
+                        ${mi(d,this.german)}
+                      </option>`)}
+                </select>
+                ${h?o`<span class="helper warn">${e("warn_type_reset")}</span>`:l}
+              </div>`:l}
+        </div>
+
+        <dl class="facts">
+          <div><dt>${e("info_type")}</dt><dd>${r??"—"}</dd></div>
+          <div><dt>${e("info_state")}</dt><dd>${c}</dd></div>
+          <div><dt>${e("info_area")}</dt><dd>${t.area??"—"}</dd></div>
+          <div><dt>${e("info_device")}</dt><dd>${t.device??"—"}</dd></div>
+          <div><dt>${e("info_integration")}</dt><dd>${t.platform??"—"}</dd></div>
+        </dl>
+        ${this.otherBridges.length?o`<div class="others">
+              ${this.otherBridges.map(d=>o`<span class="badge">${e("badge_other_bridge",{name:d})}</span>`)}
+            </div>`:l}
+
+        <button slot="actions" class="btn" @click=${this._moreInfo}>
+          ${p(Yt)} ${e("open_more_info")}
+        </button>
+        <span slot="actions" class="spacer"></span>
+        <button
+          slot="actions"
+          class="btn outlined"
+          @click=${()=>this.renderRoot.querySelector("hkm-dialog")?.close()}
+        >
+          ${e("cancel")}
+        </button>
+        <button slot="actions" class="btn filled" @click=${this._save}>${e("done")}</button>
+      </hkm-dialog>
+    `}};X.properties={hass:{attribute:!1},t:{attribute:!1},german:{type:Boolean},entity:{attribute:!1},assigned:{type:Boolean},options:{attribute:!1},typeOptions:{attribute:!1},otherBridges:{attribute:!1},canBeAccessory:{type:Boolean},_assigned:{state:!0},_name:{state:!0},_type:{state:!0}},X.styles=[L,V,y`
+      .hero-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: var(--hkm-surface-3);
+        color: var(--hkm-text-2);
+        flex: none;
+        --mdc-icon-size: 24px;
+      }
+      .hero-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: currentColor;
+      }
+      .hero-icon.on {
+        background: var(--hkm-tint);
+        color: var(--hkm-primary);
+      }
+      .assign {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: var(--hkm-surface-2);
+        cursor: pointer;
+        margin-bottom: 16px;
+      }
+      .assign-title {
+        font-weight: 500;
+      }
+      .mono {
+        font-family: var(--code-font-family, ui-monospace, SFMono-Regular, Menlo, monospace);
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        overflow-wrap: anywhere;
+        margin-top: 2px;
+      }
+      .note {
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        padding: 12px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 12px;
+      }
+      .note svg {
+        width: 18px;
+        height: 18px;
+        flex: none;
+        fill: currentColor;
+        margin-top: 1px;
+      }
+      .note.warning {
+        background: color-mix(in srgb, var(--hkm-warning) 14%, transparent);
+      }
+      .note.info {
+        background: var(--hkm-tint);
+      }
+      .note > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .note-action {
+        margin-top: 10px;
+      }
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .helper.warn {
+        color: color-mix(in srgb, var(--hkm-warning) 70%, var(--hkm-text));
+      }
+      .facts {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px 20px;
+        margin: 20px 0 4px;
+        padding: 16px 0 0;
+        border-top: 1px solid var(--hkm-divider);
+      }
+      .facts div {
+        min-width: 0;
+      }
+      dt {
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        margin-bottom: 2px;
+      }
+      dd {
+        margin: 0;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+      }
+      .others {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 14px;
+      }
+      .spacer {
+        flex: 1;
+      }
+    `];let ve=X;const ee=class ee extends f{_choose(e){w(this,"choose",e),this.renderRoot.querySelector("hkm-dialog")?.close()}render(){const e=this.t;return o`
+      <hkm-dialog .heading=${e("new_title")} wide>
+        <div class="options">
+          <button class="option" @click=${()=>this._choose("bridge")}>
+            <span class="option-icon bridge">${p(he)}</span>
+            <span class="option-text">
+              <span class="option-title">${e("new_bridge_title")}</span>
+              <span class="option-desc">${e("new_bridge_text")}</span>
+            </span>
+            ${p(De,"chev")}
+          </button>
+          <button class="option" @click=${()=>this._choose("accessory")}>
+            <span class="option-icon accessory">${p(v)}</span>
+            <span class="option-text">
+              <span class="option-title">${e("new_accessory_title")}</span>
+              <span class="option-desc">${e("new_accessory_text")}</span>
+            </span>
+            ${p(De,"chev")}
+          </button>
+        </div>
+      </hkm-dialog>
+    `}};ee.properties={t:{attribute:!1}},ee.styles=[L,V,y`
+      .options {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-bottom: 8px;
+      }
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--hkm-divider);
+        background: var(--hkm-card);
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.15s ease, border-color 0.15s ease;
+      }
+      .option:hover {
+        background: var(--hkm-surface-2);
+        border-color: var(--hkm-primary);
+      }
+      .option-icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        color: #fff;
+      }
+      .option-icon svg {
+        width: 28px;
+        height: 28px;
+        fill: currentColor;
+      }
+      .option-icon.bridge {
+        background: linear-gradient(135deg, #29b6f6, #5b3fd9);
+      }
+      .option-icon.accessory {
+        background: linear-gradient(135deg, #ff8a65, #d81b60);
+      }
+      .option-text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .option-title {
+        font-weight: 600;
+        font-size: 16px;
+      }
+      .option-desc {
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--hkm-text-2);
+      }
+      .chev {
+        width: 22px;
+        height: 22px;
+        fill: var(--hkm-text-2);
+        flex: none;
+      }
+    `];let xe=ee;const te=class te extends f{constructor(){super(),this._search="",this._selected=null,this._name="",this._remove=!0,this._error=null}willUpdate(e){if(e.has("preselected")&&this.preselected){const t=this.entities?.find(i=>i.entity_id===this.preselected);t&&this._pick(t)}}_pick(e){this._selected=e,this._name=e?e.name.slice(0,25):"",this._remove=!0,this._error=null}_bridgesOf(e){return e.bridges.map(t=>this.bridgeNames[t]).filter(Boolean)}_create(){const e=this._selected;if(!e)return;const t=this._name.trim();if(t.length<3||t.length>25){this._error=this.t("bridge_name_helper");return}w(this,"create-accessory",{entityId:e.entity_id,name:t,removeFromBridges:this._remove}),this.renderRoot.querySelector("hkm-dialog")?.close()}_icon(e){const t=this.hass.states[e.entity_id];return t&&customElements.get("ha-state-icon")?o`<ha-state-icon .hass=${this.hass} .stateObj=${t}></ha-state-icon>`:p(Se(e.domain))}_item(e){const t=O(e.accessory_type,e.domain,e.device_class,this.german),i=this._bridgesOf(e);return o`<button class="item" @click=${()=>this._pick(e)}>
+      <span class="item-icon">${this._icon(e)}</span>
+      <span class="item-text">
+        <span class="item-name">${e.name}</span>
+        <span class="item-sub">${e.area?`${e.area} · `:""}${e.entity_id}</span>
+      </span>
+      <span class="item-badges">
+        ${t?o`<span class="badge">${t}</span>`:l}
+        ${i.length?o`<span class="badge">${this.t("badge_other_bridge",{name:i[0]})}</span>`:l}
+      </span>
+    </button>`}_renderList(){const e=this.t,t=this._search.toLowerCase().split(/\s+/).filter(Boolean),i=c=>{const h=`${c.name} ${c.entity_id} ${c.area??""} ${c.device??""}`.toLowerCase();return t.every(d=>h.includes(d))},s=this.entities.filter(i),r=s.filter(c=>c.needs_accessory_mode),a=s.filter(c=>!c.needs_accessory_mode);return o`
+      <p class="intro">${e("picker_text")}</p>
+      <div class="search">
+        ${p(pe)}
+        <input
+          type="search"
+          placeholder=${e("search")}
+          .value=${this._search}
+          @input=${c=>this._search=c.target.value}
+          autofocus
+        />
+      </div>
+      <div class="list">
+        ${r.length?o`<div class="section">${p(ti)} ${e("picker_recommended")}</div>
+              ${r.map(c=>this._item(c))}`:l}
+        ${a.length?o`<div class="section">${e("picker_others")}</div>
+              ${a.map(c=>this._item(c))}`:l}
+        ${s.length?l:o`<div class="none">${e("no_results")}</div>`}
+      </div>
+    `}_renderForm(e){const t=this.t,i=this._bridgesOf(e),s=O(e.accessory_type,e.domain,e.device_class,this.german);return o`
+      <button class="item selected" @click=${()=>this._pick(null)}>
+        <span class="item-icon">${this._icon(e)}</span>
+        <span class="item-text">
+          <span class="item-name">${e.name}</span>
+          <span class="item-sub">${e.entity_id}</span>
+        </span>
+        <span class="change">${p(It)} ${t("picker_change")}</span>
+      </button>
+      <div class="form">
+        <div class="field">
+          <label for="acc-name">${t("bridge_name")}</label>
+          <input
+            id="acc-name"
+            .value=${this._name}
+            maxlength="25"
+            autocomplete="off"
+            @input=${r=>this._name=r.target.value}
+          />
+          <span class="helper">${t("accessory_name_helper")}</span>
+        </div>
+        ${i.length?o`<label class="check" @click=${()=>this._remove=!this._remove}>
+              <button
+                class="switch"
+                role="switch"
+                aria-checked=${String(this._remove)}
+                aria-label=${t("picker_remove")}
+              ></button>
+              <span>${t("picker_remove_named",{names:i.join(", ")})}</span>
+            </label>`:l}
+        ${e.needs_accessory_mode?l:o`<div class="note">${p(W)}<span>${t("picker_not_needed",{type:s??""})}</span></div>`}
+        ${this._error?o`<div class="error">${this._error}</div>`:l}
+      </div>
+    `}render(){const e=this.t,t=this._selected;return o`
+      <hkm-dialog .heading=${e("picker_title")} wide>
+        ${t?this._renderForm(t):this._renderList()}
+        <button
+          slot="actions"
+          class="btn outlined"
+          @click=${()=>this.renderRoot.querySelector("hkm-dialog")?.close()}
+        >
+          ${e("cancel")}
+        </button>
+        <button slot="actions" class="btn filled" ?disabled=${!t} @click=${this._create}>
+          ${e("create")}
+        </button>
+      </hkm-dialog>
+    `}};te.properties={hass:{attribute:!1},t:{attribute:!1},german:{type:Boolean},entities:{attribute:!1},bridgeNames:{attribute:!1},preselected:{attribute:!1},_search:{state:!0},_selected:{state:!0},_name:{state:!0},_remove:{state:!0},_error:{state:!0}},te.styles=[L,V,y`
+      .intro {
+        margin: 0 0 14px;
+        color: var(--hkm-text-2);
+        line-height: 1.5;
+        font-size: 14px;
+      }
+      .search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 44px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--hkm-divider);
+        background: var(--hkm-surface-2);
+      }
+      .search:focus-within {
+        border-color: var(--hkm-primary);
+      }
+      .search svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--hkm-text-2);
+      }
+      .search input {
+        flex: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--hkm-text);
+        font: inherit;
+        font-size: 15px;
+      }
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-top: 12px;
+        max-height: min(46vh, 420px);
+        overflow-y: auto;
+      }
+      .section {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 12px 4px 6px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--hkm-text-2);
+      }
+      .section svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+      .item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 10px;
+        border: none;
+        border-radius: 12px;
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+      }
+      .item:hover {
+        background: var(--hkm-surface-2);
+      }
+      .item.selected {
+        background: var(--hkm-tint);
+        margin-bottom: 18px;
+      }
+      .item-icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        background: var(--hkm-surface-3);
+        color: var(--hkm-text-2);
+        --mdc-icon-size: 22px;
+      }
+      .item-icon svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+      }
+      .item.selected .item-icon {
+        background: var(--hkm-card);
+        color: var(--hkm-primary);
+      }
+      .item-text {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .item-name {
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .item-sub {
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .item-badges {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 4px;
+        max-width: 45%;
+      }
+      .change {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: var(--hkm-primary);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .change svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+      }
+      .none {
+        padding: 24px;
+        text-align: center;
+        color: var(--hkm-text-2);
+      }
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .note {
+        display: flex;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: var(--hkm-surface-2);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .note svg {
+        width: 18px;
+        height: 18px;
+        flex: none;
+        fill: var(--hkm-text-2);
+      }
+      .error {
+        color: var(--hkm-error);
+        font-size: 13px;
+      }
+      @media (max-width: 520px) {
+        .item-badges {
+          display: none;
+        }
+      }
+    `];let ye=te;const P=(n,e)=>{customElements.get(n)||customElements.define(n,e)};P("hkm-dialog",_e);P("hkm-confirm",fe);P("hkm-bridge-form",be);P("hkm-entity-dialog",ve);P("hkm-new-dialog",xe);P("hkm-accessory-picker",ye);const Ye={title:"HomeKit Manager",loading:"Loading…",refresh:"Refresh",new_bridge:"New bridge",empty_title:"No HomeKit bridge yet",empty_text:"Create a bridge, pick your devices and add it to the Home app on your iPhone. No YAML required.",empty_action:"Create bridge",status_running_paired:"Paired with Apple Home",status_running_unpaired:"Ready to pair",status_starting:"Starting…",status_stopped:"Stopped",status_not_loaded:"Not loaded",status_retry:"Retrying…",status_error:"Error",status_disabled:"Disabled",status_unknown:"Unknown",port:"Port {port}",accessories_active:"{count} accessories active",capacity:"{count} of {max} slots used",pair_title:"Add to Apple Home",pair_steps:"Open the Home app, tap + → Add Accessory and scan the code. Or enter the setup code manually.",setup_code:"Setup code",paired_title:"Connected",paired_text:"This bridge is paired with {count} Apple device(s). New entities appear in the Home app automatically.",pairing_unavailable:"Pairing information is available once the bridge is running.",copy:"Copy",copied:"Setup code copied",action_settings:"Settings",action_restart:"Restart",action_unpair:"Reset pairing",action_delete:"Delete",unmanaged_title:"This bridge uses domain filters",unmanaged_text:"It was set up with the built-in HomeKit dialog and exposes entities by domain ({filter}). Adopt it to pick entities one by one. The {count} entities exposed right now stay on the bridge; new entities will no longer be added automatically.",adopt:"Adopt bridge",yaml_title:"Configured in YAML",yaml_text:"This bridge is defined in configuration.yaml. Its entities can only be changed there.",search:"Search entities, areas, devices…",view_all:"All",view_assigned:"In HomeKit",view_unassigned:"Not in HomeKit",group_by:"Group by",group_area:"Area",group_domain:"Type",group_none:"None",show_more:"More filters",show_hidden:"Show hidden & diagnostic entities",show_unsupported:"Show entities HomeKit does not support",showing:"Showing {shown} of {total} entities",no_results:"No entities match your filters.",reset_filters:"Reset filters",no_area:"No area",add_all:"Add all",remove_all:"Remove all",in_group:"{count} of {total} in HomeKit",badge_new:"will be added",badge_removed:"will be removed",badge_hidden:"hidden",badge_diagnostic:"diagnostic",badge_unsupported:"not supported",badge_accessory_mode:"own accessory recommended",badge_other_bridge:"also on {name}",badge_custom_name:"as “{name}”",pending_add:"{count} to add",pending_remove:"{count} to remove",pending_config:"{count} settings changed",discard:"Discard",apply:"Apply",applying:"Applying… the bridge restarts for a moment.",applied:"HomeKit bridge updated",apply_hint:"The bridge restarts briefly when you apply changes.",too_many:"A bridge can hold at most {max} accessories. Remove some entities or create a second bridge.",entity_in_bridge:"Expose on this bridge",homekit_name:"Name in HomeKit",homekit_name_helper:"Leave empty to use the Home Assistant name.",accessory_type:"Accessory type",accessory_type_auto:"Automatic ({type})",info_type:"HomeKit type",info_area:"Area",info_device:"Device",info_integration:"Integration",info_state:"State",info_entity_id:"Entity ID",open_more_info:"Open in Home Assistant",warn_unsupported:"HomeKit has no matching accessory for this entity (for sensors only temperature, humidity, air quality, CO, CO₂ and light are supported). It will not show up in the Home app.",warn_accessory_mode:"Apple recommends pairing cameras, locks, TVs and activity remotes as separate accessories. On a bridge they work, but some features may be limited.",warn_type_reset:"Changing the type recreates the accessory in the Home app (room and scenes need to be set again).",done:"Done",cancel:"Cancel",close:"Close",save:"Save",create:"Create",settings_title:"Bridge settings",create_title:"New HomeKit bridge",create_text:"The bridge starts empty. You can add entities right after creating it.",bridge_name:"Name",bridge_name_helper:"Shown in the Home app (3–25 characters, A–Z, digits, spaces).",bridge_port:"Port",bridge_port_helper:"TCP port of the HomeKit server. Only change it if you know you need to.",creating:"Creating bridge…",created:"Bridge “{name}” created",saving:"Saving… the bridge restarts for a moment.",saved:"Settings saved",confirm_delete_title:"Delete “{name}”?",confirm_delete_text:"The bridge and all its accessories are removed from Home Assistant and from Apple Home. Rooms, scenes and automations in the Home app that use them are lost.",confirm_unpair_title:"Reset pairing?",confirm_unpair_text:"All Apple devices are disconnected from this bridge. Afterwards you can add it to the Home app again with the setup code.",confirm_adopt_title:"Adopt “{name}”?",confirm_adopt_text:"The domain filter is converted into a fixed list of the {count} entities exposed right now. Pairing stays intact.",confirm_discard_title:"Discard changes?",confirm_discard_text:"You have changes that were not applied yet.",deleted:"Bridge deleted",unpaired:"Pairing reset. You can pair the bridge again now.",restarted:"Bridge restarted",adopted:"Bridge adopted",error:"Error: {message}",new_instance:"Add",new_title:"What do you want to add?",new_bridge_title:"HomeKit bridge",new_bridge_text:"Many devices with one pairing. Ideal for lights, switches, sensors, climate and covers (up to 149 devices).",new_accessory_title:"Standalone accessory",new_accessory_text:"One device with its own pairing. Needed for TVs, receivers, projectors, cameras, locks and activity remotes.",accessories_tab:"Accessories",accessories_hint:"Devices paired on their own (TVs, cameras, locks …)",accessories_title:"Standalone accessories",accessories_text:"Apple Home only shows TVs, receivers and projectors with inputs and remote, cameras with live video and locks reliably when they are paired as their own accessory. Every device gets its own setup code.",accessories_empty:"No standalone accessories yet.",add_accessory:"Add device",empty_action_accessory:"Add TV or camera",empty_hint_accessory:"TVs, cameras and locks are added as standalone accessories with their own setup code.",badge_is_accessory:"standalone accessory",make_accessory:"Pair as standalone accessory",creating_accessory:"Creating accessory…",created_accessory:"“{name}” created. Pair it with its setup code.",confirm_delete_accessory_text:"The accessory is removed from Apple Home. Rooms, scenes and automations in the Home app that use it are lost.",picker_title:"Add standalone accessory",picker_text:"Pick the device. Recommended are devices that Apple Home only fully supports as standalone accessory.",picker_recommended:"Recommended",picker_others:"All other devices",picker_change:"Change",picker_remove:"Remove from bridges",picker_remove_named:"Remove from {names} (otherwise it shows up twice in the Home app)",picker_not_needed:"This device ({type}) also works on a bridge. A standalone accessory needs its own pairing.",accessory_name_helper:"Shown in the Home app. A–Z, digits and spaces; umlauts are rewritten.",cat_light:"Lights",cat_switch:"Switches",cat_climate:"Climate",cat_cover:"Covers & valves",cat_sensor:"Sensors",cat_security:"Security",cat_media:"Media",cat_scene:"Scenes & scripts",cat_select:"Selects",cat_appliance:"Appliances",cat_presence:"Presence",cat_other:"Other"},_i={title:"HomeKit Manager",loading:"Wird geladen…",refresh:"Aktualisieren",new_bridge:"Neue Bridge",empty_title:"Noch keine HomeKit Bridge",empty_text:"Lege eine Bridge an, wähle deine Geräte aus und füge sie in der Home-App auf dem iPhone hinzu. Ganz ohne YAML.",empty_action:"Bridge anlegen",status_running_paired:"Mit Apple Home gekoppelt",status_running_unpaired:"Bereit zum Koppeln",status_starting:"Startet…",status_stopped:"Gestoppt",status_not_loaded:"Nicht geladen",status_retry:"Neuer Versuch…",status_error:"Fehler",status_disabled:"Deaktiviert",status_unknown:"Unbekannt",port:"Port {port}",accessories_active:"{count} Geräte aktiv",capacity:"{count} von {max} Plätzen belegt",pair_title:"Zu Apple Home hinzufügen",pair_steps:"Öffne die Home-App, tippe auf + → Gerät hinzufügen und scanne den Code. Alternativ den Setup-Code manuell eingeben.",setup_code:"Setup-Code",paired_title:"Verbunden",paired_text:"Die Bridge ist mit {count} Apple-Gerät(en) gekoppelt. Neue Entitäten erscheinen automatisch in der Home-App.",pairing_unavailable:"Kopplungsdaten sind verfügbar, sobald die Bridge läuft.",copy:"Kopieren",copied:"Setup-Code kopiert",action_settings:"Einstellungen",action_restart:"Neu starten",action_unpair:"Kopplung zurücksetzen",action_delete:"Löschen",unmanaged_title:"Diese Bridge nutzt Domain-Filter",unmanaged_text:"Sie wurde mit dem eingebauten HomeKit-Dialog eingerichtet und gibt Entitäten nach Domain frei ({filter}). Übernimm sie, um Entitäten einzeln auszuwählen. Die {count} aktuell freigegebenen Entitäten bleiben erhalten, neue Entitäten werden danach nicht mehr automatisch hinzugefügt.",adopt:"Bridge übernehmen",yaml_title:"Per YAML konfiguriert",yaml_text:"Diese Bridge ist in der configuration.yaml definiert. Ihre Entitäten lassen sich nur dort ändern.",search:"Entitäten, Bereiche, Geräte suchen…",view_all:"Alle",view_assigned:"In HomeKit",view_unassigned:"Nicht in HomeKit",group_by:"Gruppieren",group_area:"Bereich",group_domain:"Typ",group_none:"Keine",show_more:"Weitere Filter",show_hidden:"Versteckte & Diagnose-Entitäten anzeigen",show_unsupported:"Von HomeKit nicht unterstützte Entitäten anzeigen",showing:"{shown} von {total} Entitäten",no_results:"Keine Entitäten passen zu deinen Filtern.",reset_filters:"Filter zurücksetzen",no_area:"Ohne Bereich",add_all:"Alle hinzufügen",remove_all:"Alle entfernen",in_group:"{count} von {total} in HomeKit",badge_new:"wird hinzugefügt",badge_removed:"wird entfernt",badge_hidden:"versteckt",badge_diagnostic:"Diagnose",badge_unsupported:"nicht unterstützt",badge_accessory_mode:"eigenes Zubehör empfohlen",badge_other_bridge:"auch in {name}",badge_custom_name:"als „{name}“",pending_add:"{count} hinzufügen",pending_remove:"{count} entfernen",pending_config:"{count} Einstellungen geändert",discard:"Verwerfen",apply:"Übernehmen",applying:"Wird übernommen… die Bridge startet kurz neu.",applied:"HomeKit Bridge aktualisiert",apply_hint:"Beim Übernehmen startet die Bridge kurz neu.",too_many:"Eine Bridge kann höchstens {max} Geräte enthalten. Entferne Entitäten oder lege eine zweite Bridge an.",entity_in_bridge:"In dieser Bridge freigeben",homekit_name:"Name in HomeKit",homekit_name_helper:"Leer lassen, um den Namen aus Home Assistant zu verwenden.",accessory_type:"Gerätetyp",accessory_type_auto:"Automatisch ({type})",info_type:"HomeKit-Typ",info_area:"Bereich",info_device:"Gerät",info_integration:"Integration",info_state:"Zustand",info_entity_id:"Entitäts-ID",open_more_info:"In Home Assistant öffnen",warn_unsupported:"HomeKit hat für diese Entität keinen passenden Gerätetyp (bei Sensoren nur Temperatur, Luftfeuchtigkeit, Luftqualität, CO, CO₂ und Helligkeit). Sie erscheint nicht in der Home-App.",warn_accessory_mode:"Apple empfiehlt, Kameras, Schlösser, Fernseher und Aktivitäts-Fernbedienungen als eigenständiges Zubehör zu koppeln. In einer Bridge funktionieren sie, aber teils eingeschränkt.",warn_type_reset:"Ein Typwechsel legt das Gerät in der Home-App neu an (Raum und Szenen müssen neu zugewiesen werden).",done:"Fertig",cancel:"Abbrechen",close:"Schließen",save:"Speichern",create:"Anlegen",settings_title:"Bridge-Einstellungen",create_title:"Neue HomeKit Bridge",create_text:"Die Bridge startet leer. Entitäten fügst du direkt danach hinzu.",bridge_name:"Name",bridge_name_helper:"Wird in der Home-App angezeigt (3–25 Zeichen, A–Z, Ziffern, Leerzeichen).",bridge_port:"Port",bridge_port_helper:"TCP-Port des HomeKit-Servers. Nur ändern, wenn nötig.",creating:"Bridge wird angelegt…",created:"Bridge „{name}“ angelegt",saving:"Wird gespeichert… die Bridge startet kurz neu.",saved:"Einstellungen gespeichert",confirm_delete_title:"„{name}“ löschen?",confirm_delete_text:"Die Bridge und alle ihre Geräte werden aus Home Assistant und aus Apple Home entfernt. Räume, Szenen und Automationen der Home-App, die sie nutzen, gehen verloren.",confirm_unpair_title:"Kopplung zurücksetzen?",confirm_unpair_text:"Alle Apple-Geräte werden von dieser Bridge getrennt. Danach kannst du sie mit dem Setup-Code erneut zur Home-App hinzufügen.",confirm_adopt_title:"„{name}“ übernehmen?",confirm_adopt_text:"Der Domain-Filter wird in eine feste Liste der {count} aktuell freigegebenen Entitäten umgewandelt. Die Kopplung bleibt erhalten.",confirm_discard_title:"Änderungen verwerfen?",confirm_discard_text:"Es gibt Änderungen, die noch nicht übernommen wurden.",deleted:"Bridge gelöscht",unpaired:"Kopplung zurückgesetzt. Die Bridge kann jetzt neu gekoppelt werden.",restarted:"Bridge neu gestartet",adopted:"Bridge übernommen",error:"Fehler: {message}",new_instance:"Hinzufügen",new_title:"Was möchtest du hinzufügen?",new_bridge_title:"HomeKit Bridge",new_bridge_text:"Viele Geräte mit einer Kopplung. Ideal für Licht, Schalter, Sensoren, Klima und Rollläden (bis 149 Geräte).",new_accessory_title:"Einzelgerät",new_accessory_text:"Ein Gerät mit eigener Kopplung. Nötig für Fernseher, Receiver, Projektoren, Kameras, Schlösser und Aktivitäts-Fernbedienungen.",accessories_tab:"Einzelgeräte",accessories_hint:"Eigenständig gekoppelte Geräte (Fernseher, Kameras, Schlösser …)",accessories_title:"Einzelgeräte",accessories_text:"Fernseher, Receiver und Projektoren mit Eingängen und Fernbedienung, Kameras mit Livebild und Schlösser zeigt Apple Home nur zuverlässig an, wenn sie als eigenes Zubehör gekoppelt sind. Jedes Gerät bekommt einen eigenen Setup-Code.",accessories_empty:"Noch keine Einzelgeräte.",add_accessory:"Gerät hinzufügen",empty_action_accessory:"Fernseher oder Kamera hinzufügen",empty_hint_accessory:"Fernseher, Kameras und Schlösser werden als Einzelgerät mit eigenem Setup-Code hinzugefügt.",badge_is_accessory:"Einzelgerät",make_accessory:"Als Einzelgerät koppeln",creating_accessory:"Einzelgerät wird angelegt…",created_accessory:"„{name}“ angelegt. Jetzt mit dem Setup-Code koppeln.",confirm_delete_accessory_text:"Das Gerät wird aus Apple Home entfernt. Räume, Szenen und Automationen der Home-App, die es nutzen, gehen verloren.",picker_title:"Einzelgerät hinzufügen",picker_text:"Wähle das Gerät. Empfohlen sind Geräte, die Apple Home nur als Einzelgerät voll unterstützt.",picker_recommended:"Empfohlen",picker_others:"Alle weiteren Geräte",picker_change:"Ändern",picker_remove:"Aus Bridges entfernen",picker_remove_named:"Aus {names} entfernen (sonst erscheint es doppelt in der Home-App)",picker_not_needed:"Dieses Gerät ({type}) funktioniert auch in einer Bridge. Als Einzelgerät braucht es eine eigene Kopplung.",accessory_name_helper:"Wird in der Home-App angezeigt. A–Z, Ziffern und Leerzeichen; Umlaute werden umgeschrieben.",cat_light:"Licht",cat_switch:"Schalter",cat_climate:"Klima",cat_cover:"Rollläden & Ventile",cat_sensor:"Sensoren",cat_security:"Sicherheit",cat_media:"Medien",cat_scene:"Szenen & Skripte",cat_select:"Auswahl",cat_appliance:"Haushalt",cat_presence:"Anwesenheit",cat_other:"Sonstiges"},Je=n=>{const e=n?.toLowerCase().startsWith("de")?_i:Ye;return(t,i)=>{let s=e[t]??Ye[t]??t;if(i)for(const[r,a]of Object.entries(i))s=s.split(`{${r}}`).join(String(a));return s}},fi=n=>!!n?.toLowerCase().startsWith("de"),bi=5e3,x="__accessories__",Qe="homekit_manager.",M={get(n){try{return window.localStorage.getItem(Qe+n)}catch{return null}},set(n,e){try{window.localStorage.setItem(Qe+n,e)}catch{}}},ce=(n,e)=>(n?.name||null)===(e?.name||null)&&(n?.type||null)===(e?.type||null),ie=class ie extends f{constructor(){super(),this._nextDialog=null,this._t=Je("en"),this._german=!1,this._loaded=!1,this._resetFilters=()=>{this._search="",this._view="all",this._categories=new Set,this._showHidden=!1,this._showUnsupported=!1},this._bridges=null,this._instances=[],this._accessories=[],this._selected=M.get("selected"),this._entities=null,this._pairing={},this._draft=new Set,this._draftConfig={},this._search="",this._view="all",this._groupBy=M.get("group_by")||"area",this._categories=new Set,this._showHidden=!1,this._showUnsupported=!1,this._showFilters=!1,this._collapsed=new Set,this._busy=null,this._dialog=null,this._loadError=null}get hass(){return this._hass}set hass(e){const t=this._hass;this._hass=e;const i=e.locale?.language||e.language;if(!t||(t.locale?.language||t.language)!==i){this._t=Je(i),this._german=fi(i),this.requestUpdate("hass",t),!t&&this.isConnected&&this._start();return}this._hassTimer===void 0&&(this._hassTimer=window.setTimeout(()=>{this._hassTimer=void 0,this.requestUpdate("hass")},1e3))}connectedCallback(){super.connectedCallback(),this._hass&&this._start()}disconnectedCallback(){super.disconnectedCallback(),window.clearInterval(this._pollTimer),window.clearTimeout(this._hassTimer),this._pollTimer=void 0,this._hassTimer=void 0}_start(){this._loaded||(this._loaded=!0,this._loadAll()),this._pollTimer===void 0&&(this._pollTimer=window.setInterval(()=>this._poll(),bi))}get _bridge(){return this._bridges?.find(e=>e.entry_id===this._selected)}_instance(e){return this._instances.find(t=>t.entry_id===e)}_setInstances(e){this._instances=e,this._bridges=e.filter(i=>i.mode==="bridge"),this._accessories=e.filter(i=>i.mode==="accessory"),this._selected===x||this._bridges.some(i=>i.entry_id===this._selected)||(this._selected=this._bridges[0]?.entry_id??(this._accessories.length?x:null))}_visibleInstances(){if(this._selected===x)return this._accessories;const e=this._bridge;return e?[e]:[]}async _loadAll(){try{const[e,t]=await Promise.all([oe(this.hass),Ge(this.hass)]);this._entities=t,this._setInstances(e),this._resetDraft(),this._loadError=null,this._loadPairing()}catch(e){this._loadError=de(e)}}async _reloadEntities(){try{this._entities=await Ge(this.hass)}catch(e){this._toast(this._t("error",{message:de(e)}))}}async _poll(){if(!(!this._hass||this._busy||document.hidden))try{const e=new Map(this._instances.map(r=>[r.entry_id,r])),t=this._bridge,i=this._isDirty;this._setInstances(await oe(this.hass));const s=this._bridge;s&&!i&&(!t||t.entities.join()!==s.entities.join()||t.entry_id!==s.entry_id)&&this._resetDraft();for(const r of this._visibleInstances()){const a=e.get(r.entry_id),c=this._pairing[r.entry_id];(!a||a.status!==r.status||a.paired!==r.paired||!c?.available||r.pin&&c.pin!==r.pin)&&this._loadPairingFor(r.entry_id)}}catch{}}_loadPairing(){for(const e of this._visibleInstances())this._loadPairingFor(e.entry_id)}async _loadPairingFor(e){try{const t=await ii(this.hass,e);this._pairing={...this._pairing,[e]:t}}catch{}}_resetDraft(){const e=this._bridge;this._draft=new Set(e?.entities??[]),this._draftConfig={}}_replaceBridge(e){this._setInstances(this._instances.map(t=>t.entry_id===e.entry_id?e:t))}_options(e){const t=this._bridge?.entity_config[e]??{},i=this._draftConfig[e];return i?{...t,...i}:t}get _changes(){const e=this._bridge;if(!e)return{added:[],removed:[],config:[]};const t=new Set(e.entities),i=[...this._draft].filter(a=>!t.has(a)),s=e.entities.filter(a=>!this._draft.has(a)),r=Object.keys(this._draftConfig).filter(a=>!ce(e.entity_config[a],this._options(a)));return{added:i,removed:s,config:r}}get _isDirty(){const{added:e,removed:t,config:i}=this._changes;return e.length+t.length+i.length>0}_toast(e){this.dispatchEvent(new CustomEvent("hass-notification",{detail:{message:e},bubbles:!0,composed:!0}))}async _run(e,t,i){this._busy=e;try{const s=await t();return i&&this._toast(i),s}catch(s){this._toast(this._t("error",{message:de(s)}));return}finally{this._busy=null}}_toggle(e,t){if(this._busy)return;const i=new Set(this._draft);t??!i.has(e)?i.add(e):i.delete(e),this._draft=i}_toggleGroup(e,t){const i=new Set(this._draft);for(const s of e)t&&s.supported?i.add(s.entity_id):t||i.delete(s.entity_id);this._draft=i}async _apply(){const e=this._bridge;if(!e)return;const{config:t}=this._changes,i={};for(const r of t){const a=this._options(r);i[r]={name:a.name||null,type:a.type||null}}const s=await this._run(this._t("applying"),()=>ai(this.hass,e.entry_id,[...this._draft].sort(),i),this._t("applied"));s&&(this._replaceBridge(s),this._resetDraft(),this._reloadEntities(),this._loadPairing())}_select(e){if(e===this._selected)return;const t=()=>{this._selected=e,M.set("selected",e),this._resetDraft(),this._loadPairing()};this._isDirty?this._confirm(this._t("confirm_discard_title"),this._t("confirm_discard_text"),this._t("discard"),t,!0):t()}_confirm(e,t,i,s,r=!1){this._dialog={kind:"confirm",heading:e,text:t,confirmLabel:i,danger:r,action:s}}async _create(e){const t=await this._run(this._t("creating"),()=>si(this.hass,e),this._t("created",{name:e}));t&&(this._setInstances([...this._instances,t]),this._selected=t.entry_id,M.set("selected",t.entry_id),this._resetDraft(),this._reloadEntities(),this._loadPairing())}async _createAccessory(e,t,i){const s=await this._run(this._t("creating_accessory"),()=>ri(this.hass,e,t,i),this._t("created_accessory",{name:t}));s&&(this._setInstances(await oe(this.hass).catch(()=>[...this._instances,s])),this._selected=x,M.set("selected",x),this._resetDraft(),this._reloadEntities(),this._loadPairing())}async _saveSettings(e,t,i){const s=await this._run(this._t("saving"),()=>ni(this.hass,e,{name:t,port:i}),this._t("saved"));s&&(this._replaceBridge(s),this._loadPairingFor(e))}_askDelete(e){const t=this._instance(e);if(!t)return;const i=t.mode==="accessory";this._confirm(this._t("confirm_delete_title",{name:t.name}),this._t(i?"confirm_delete_accessory_text":"confirm_delete_text"),this._t("action_delete"),async()=>{await this._run(this._t("loading"),()=>li(this.hass,e).then(()=>!0),this._t("deleted"))&&(this._setInstances(this._instances.filter(r=>r.entry_id!==e)),this._resetDraft(),this._loadPairing(),this._reloadEntities())},!0)}_askUnpair(e){this._confirm(this._t("confirm_unpair_title"),this._t("confirm_unpair_text"),this._t("action_unpair"),async()=>{const t=await this._run(this._t("loading"),()=>ci(this.hass,e),this._t("unpaired"));t&&this._replaceBridge(t),this._loadPairingFor(e)},!0)}async _restart(e){const t=await this._run(this._t("status_starting"),()=>di(this.hass,e),this._t("restarted"));t&&this._replaceBridge(t),this._loadPairingFor(e)}_askAdopt(){const e=this._bridge,t=e.accessory_entities?.length??this._implicitCount(e);this._confirm(this._t("confirm_adopt_title",{name:e.name}),this._t("confirm_adopt_text",{count:t}),this._t("adopt"),async()=>{const i=await this._run(this._t("loading"),()=>oi(this.hass,e.entry_id),this._t("adopted"));i&&(this._replaceBridge(i),this._resetDraft(),this._reloadEntities())})}_implicitCount(e){return this._entities?.entities.filter(t=>t.bridges.includes(e.entry_id)).length??0}async _copyPin(e){try{await navigator.clipboard.writeText(e.replace(/-/g,"")),this._toast(this._t("copied"))}catch{}}_accessoryFor(e){return this._accessories.find(t=>t.entity_id===e)}_baseEntities(){const e=this._bridge;if(!this._entities||!e)return[];const t=new Set(e.entities);return this._entities.entities.filter(i=>this._draft.has(i.entity_id)||t.has(i.entity_id)?!0:!(!this._showUnsupported&&!i.supported||!this._showHidden&&(i.hidden||i.entity_category)))}_matchesSearch(e,t){if(!t.length)return!0;const i=this._options(e.entity_id).name??"",s=`${e.name} ${e.entity_id} ${e.area??""} ${e.device??""} ${i}`.toLowerCase();return t.every(r=>s.includes(r))}_filtered(e){const t=this._search.toLowerCase().split(/\s+/).filter(Boolean);return e.filter(i=>{const s=this._draft.has(i.entity_id);return this._view==="assigned"&&!s||this._view==="unassigned"&&s||this._categories.size&&!this._categories.has(j(i.domain).id)?!1:this._matchesSearch(i,t)})}_groups(e){const t=this._t;if(this._groupBy==="none")return[{key:"all",label:t("view_all"),entities:e}];const i=new Map;for(const r of e){let a,c,h;if(this._groupBy==="area")a=r.area_id??"",c=r.area??t("no_area");else{const g=j(r.domain);a=g.id,c=t(g.label),h=g.icon}let d=i.get(a);d||(d={key:a,label:c,icon:h,entities:[]},i.set(a,d)),d.entities.push(r)}const s=[...i.values()];if(this._groupBy==="area")s.sort((r,a)=>r.key?a.key?r.label.localeCompare(a.label):-1:1);else{const r=[...ue.map(a=>a.id),"other"];s.sort((a,c)=>r.indexOf(a.key)-r.indexOf(c.key))}return s}willUpdate(e){e.has("_groupBy")&&M.set("group_by",this._groupBy)}render(){const e=this._t;return o`
+      <div class="toolbar">
+        <ha-menu-button .hass=${this.hass} .narrow=${this.narrow}></ha-menu-button>
+        <div class="toolbar-title">${e("title")}</div>
+        <button
+          class="icon-btn"
+          title=${e("refresh")}
+          aria-label=${e("refresh")}
+          @click=${()=>this._loadAll()}
+        >
+          ${p(Xt)}
+        </button>
+      </div>
+      <div class="scroller">
+        <div class="content">${this._renderBody()}</div>
+      </div>
+      ${this._renderDialog()}
+    `}_renderBody(){const e=this._t;if(this._loadError)return o`<div class="card message error-card">
+        ${p(Dt)}
+        <div>${e("error",{message:this._loadError})}</div>
+        <button class="btn tonal" @click=${()=>this._loadAll()}>${e("refresh")}</button>
+      </div>`;if(!this._bridges||!this._entities)return o`<div class="loading"><div class="spinner"></div>${e("loading")}</div>`;if(!this._bridges.length&&!this._accessories.length&&this._selected!==x)return this._renderEmpty();if(this._selected===x||!this._bridge)return o`${this._renderTabs()} ${this._renderAccessories()}`;const t=this._bridge;return o`
+      ${this._renderTabs()} ${this._renderHero(t)}
+      ${t.yaml?this._renderNotice(W,e("yaml_title"),e("yaml_text")):t.manageable?this._renderEntities(t):this._renderUnmanaged(t)}
+    `}_renderEmpty(){const e=this._t;return o`
+      <div class="empty card">
+        <div class="empty-art">
+          <div class="empty-ring"></div>
+          <div class="bridge-tile large">${p(he)}</div>
+        </div>
+        <h2>${e("empty_title")}</h2>
+        <p>${e("empty_text")}</p>
+        <div class="empty-actions">
+          <button
+            class="btn filled"
+            ?disabled=${!!this._busy}
+            @click=${()=>this._dialog={kind:"create"}}
+          >
+            ${this._busy?o`<span class="spinner small"></span>`:p(F)}
+            ${this._busy??e("empty_action")}
+          </button>
+          <button
+            class="btn outlined"
+            ?disabled=${!!this._busy}
+            @click=${()=>this._dialog={kind:"add-accessory"}}
+          >
+            ${p(v)} ${e("empty_action_accessory")}
+          </button>
+        </div>
+        <p class="empty-hint">${e("empty_hint_accessory")}</p>
+      </div>
+    `}_statusInfo(e){const t=this._t;switch(e.status){case"running":return e.paired?{cls:"ok",label:t("status_running_paired")}:{cls:"ready",label:t("status_running_unpaired")};case"starting":case"retry":return{cls:"busy",label:t(e.status==="retry"?"status_retry":"status_starting")};case"disabled":case"not_loaded":case"stopped":return{cls:"off",label:t(`status_${e.status}`)};case"error":return{cls:"bad",label:t("status_error")};default:return{cls:"off",label:t("status_unknown")}}}_renderTabs(){const e=this._t;return o`
+      <nav class="tabs" aria-label="Bridges">
+        ${this._bridges.map(t=>{const i=this._statusInfo(t);return o`<button
+            class="tab"
+            aria-selected=${String(t.entry_id===this._selected)}
+            @click=${()=>this._select(t.entry_id)}
+            title=${i.label}
+          >
+            <span class="dot ${i.cls}"></span>
+            <span class="tab-name">${t.name}</span>
+            ${t.manageable?o`<span class="tab-count">${t.entities.length}</span>`:l}
+          </button>`})}
+        <span class="tab-sep" aria-hidden="true"></span>
+        <button
+          class="tab"
+          aria-selected=${String(this._selected===x)}
+          @click=${()=>this._select(x)}
+          title=${e("accessories_hint")}
+        >
+          ${p(v)}
+          <span class="tab-name">${e("accessories_tab")}</span>
+          <span class="tab-count">${this._accessories.length}</span>
+        </button>
+        <button
+          class="tab add"
+          ?disabled=${!!this._busy}
+          @click=${()=>this._dialog={kind:"new"}}
+        >
+          ${p(F)} ${e("new_instance")}
+        </button>
+      </nav>
+    `}_renderHero(e){const t=this._t,i=this._statusInfo(e),s=this._entities.max_accessories,r=e.manageable?this._draft.size:e.accessory_entities?.length??0,a=Math.min(100,Math.round(r/s*100)),c=!!this._busy;return o`
+      <section class="card hero">
+        <div class="hero-main">
+          <div class="hero-head">
+            <div class="bridge-tile">${p(he)}</div>
+            <div class="hero-titles">
+              <h1>${e.name}</h1>
+              <div class="hero-meta">
+                <span class="status ${i.cls}"><span class="dot ${i.cls}"></span>${i.label}</span>
+                ${e.port?o`<span>${t("port",{port:e.port})}</span>`:l}
+                ${e.accessory_entities?o`<span>${t("accessories_active",{count:e.accessory_entities.length})}</span>`:l}
+              </div>
+            </div>
+          </div>
+
+          <div class="capacity">
+            <div class="capacity-label">
+              <span>${t("capacity",{count:r,max:s})}</span><span>${a}%</span>
+            </div>
+            <div class="meter ${r>s?"over":""}"><div style="width:${a}%"></div></div>
+          </div>
+
+          <div class="hero-actions">
+            ${e.yaml?l:o`<button class="btn outlined small" ?disabled=${c} @click=${()=>this._dialog={kind:"settings",entryId:e.entry_id}}>
+                  ${p(K)} ${t("action_settings")}
+                </button>`}
+            <button class="btn outlined small" ?disabled=${c} @click=${()=>this._restart(e.entry_id)}>
+              ${p(Fe)} ${t("action_restart")}
+            </button>
+            ${e.paired?o`<button class="btn outlined small" ?disabled=${c} @click=${()=>this._askUnpair(e.entry_id)}>
+                  ${p(Ke)} ${t("action_unpair")}
+                </button>`:l}
+            ${e.yaml?l:o`<button class="btn small danger" ?disabled=${c} @click=${()=>this._askDelete(e.entry_id)}>
+                  ${p(Ue)} ${t("action_delete")}
+                </button>`}
+          </div>
+        </div>
+        ${this._renderPairing(e)}
+      </section>
+    `}_renderPairing(e){const t=this._t,i=this._pairing[e.entry_id];return e.paired?o`<div class="pairing paired">
+        <div class="paired-icon">${p(Ze)}</div>
+        <div class="pairing-title">${t("paired_title")}</div>
+        <p>${t("paired_text",{count:e.paired_clients||1})}</p>
+      </div>`:!i?.available||!i.pin?o`<div class="pairing pending">
+        <div class="spinner"></div>
+        <p>${t("pairing_unavailable")}</p>
+      </div>`:o`<div class="pairing">
+      <div class="pairing-title">${p(Qt)} ${t("pair_title")}</div>
+      <div class="pairing-body">
+        ${i.qr?o`<img class="qr" src=${i.qr} alt="HomeKit QR" />`:l}
+        <div class="code-box">
+          <div class="code-label">${t("setup_code")}</div>
+          <button class="code" title=${t("copy")} @click=${()=>this._copyPin(i.pin)}>
+            <span>${i.pin}</span>${p(Ie)}
+          </button>
+          <p>${t("pair_steps")}</p>
+        </div>
+      </div>
+    </div>`}_renderNotice(e,t,i,s){return o`<section class="card notice">
+      <div class="notice-icon">${p(e)}</div>
+      <div class="notice-body">
+        <h3>${t}</h3>
+        <p>${i}</p>
+        ${s??l}
+      </div>
+    </section>`}_renderAccessories(){const e=this._t,t=!!this._busy;return o`
+      <section class="card notice accessories-intro">
+        <div class="notice-icon">${p(v)}</div>
+        <div class="notice-body">
+          <h3>${e("accessories_title")}</h3>
+          <p>${e("accessories_text")}</p>
+          <button
+            class="btn filled"
+            ?disabled=${t}
+            @click=${()=>this._dialog={kind:"add-accessory"}}
+          >
+            ${t?o`<span class="spinner small"></span>`:p(F)}
+            ${this._busy??e("add_accessory")}
+          </button>
+        </div>
+      </section>
+      ${this._accessories.length?o`<div class="acc-grid">${this._accessories.map(i=>this._renderAccessoryCard(i))}</div>`:o`<div class="card message">${p(v)}<div>${e("accessories_empty")}</div></div>`}
+    `}_renderAccessoryCard(e){const t=this._t,i=!!this._busy,s=this._statusInfo(e),r=this._entities?.entities.find(g=>g.entity_id===e.entity_id),a=e.entity_id?this.hass.states[e.entity_id]:void 0,c=r?O(r.accessory_type,r.domain,r.device_class,this._german):null,h=this._pairing[e.entry_id];let d;return e.paired?d=o`<div class="acc-paired">
+        ${p(Ze)}<span>${t("status_running_paired")}</span>
+      </div>`:h?.available&&h.pin?d=o`<div class="acc-pairing">
+        ${h.qr?o`<img class="qr small" src=${h.qr} alt="HomeKit QR" />`:l}
+        <div class="code-box">
+          <div class="code-label">${t("setup_code")}</div>
+          <button class="code" title=${t("copy")} @click=${()=>this._copyPin(h.pin)}>
+            <span>${h.pin}</span>${p(Ie)}
+          </button>
+        </div>
+      </div>`:d=o`<div class="acc-pairing pending">
+        <div class="spinner"></div><span>${t("pairing_unavailable")}</span>
+      </div>`,o`
+      <section class="card acc-card">
+        <div class="acc-head">
+          <div class="row-icon on">
+            ${r?this._stateIcon(r,a):p(v)}
+          </div>
+          <div class="acc-titles">
+            <div class="acc-name">${e.name}</div>
+            <div class="mono">${e.entity_id??"—"}</div>
+          </div>
+        </div>
+        <div class="acc-meta">
+          <span class="status"><span class="dot ${s.cls}"></span>${s.label}</span>
+          ${c?o`<span class="badge primary">${c}</span>`:l}
+          ${e.port?o`<span class="badge">${t("port",{port:e.port})}</span>`:l}
+        </div>
+        ${d}
+        <div class="acc-actions">
+          ${e.yaml?l:o`<button
+                class="icon-btn"
+                title=${t("action_settings")}
+                aria-label=${t("action_settings")}
+                ?disabled=${i}
+                @click=${()=>this._dialog={kind:"settings",entryId:e.entry_id}}
+              >
+                ${p(K)}
+              </button>`}
+          <button
+            class="icon-btn"
+            title=${t("action_restart")}
+            aria-label=${t("action_restart")}
+            ?disabled=${i}
+            @click=${()=>this._restart(e.entry_id)}
+          >
+            ${p(Fe)}
+          </button>
+          ${e.paired?o`<button
+                class="icon-btn"
+                title=${t("action_unpair")}
+                aria-label=${t("action_unpair")}
+                ?disabled=${i}
+                @click=${()=>this._askUnpair(e.entry_id)}
+              >
+                ${p(Ke)}
+              </button>`:l}
+          <span class="spacer"></span>
+          ${e.yaml?l:o`<button
+                class="btn small danger"
+                ?disabled=${i}
+                @click=${()=>this._askDelete(e.entry_id)}
+              >
+                ${p(Ue)} ${t("action_delete")}
+              </button>`}
+        </div>
+      </section>
+    `}_renderUnmanaged(e){const t=this._t,i=e.filter??{},s=[...i.include_domains??[],...i.include_entity_globs??[]],r=[...i.exclude_domains??[],...i.exclude_entities??[]],a=(s.length?s.join(", "):this._german?"alle":"all")+(r.length?this._german?`, ohne ${r.length}`:`, minus ${r.length}`:""),c=e.accessory_entities?.length??this._implicitCount(e);return this._renderNotice(qe,t("unmanaged_title"),t("unmanaged_text",{filter:a,count:c}),o`<button class="btn filled" ?disabled=${!!this._busy} @click=${()=>this._askAdopt()}>
+        ${t("adopt")}
+      </button>`)}_renderEntities(e){const t=this._t,i=this._baseEntities(),s=this._filtered(i),r=this._groups(s),a=i.filter(d=>this._draft.has(d.entity_id)).length,c=new Map;for(const d of i){const g=j(d.domain).id;c.set(g,(c.get(g)??0)+1)}const h=this._search||this._view!=="all"||this._categories.size||this._showHidden||this._showUnsupported;return o`
+      <section class="filters">
+        <div class="search">
+          ${p(pe)}
+          <input
+            type="search"
+            .value=${this._search}
+            placeholder=${t("search")}
+            aria-label=${t("search")}
+            @input=${d=>this._search=d.target.value}
+          />
+          ${this._search?o`<button class="icon-btn small" aria-label=${t("close")} @click=${()=>this._search=""}>
+                ${p(q)}
+              </button>`:l}
+        </div>
+        <div class="filter-row">
+          <div class="segmented" role="group">
+            ${["all","assigned","unassigned"].map(d=>o`<button
+                aria-pressed=${String(this._view===d)}
+                @click=${()=>this._view=d}
+              >
+                ${t(`view_${d}`)}
+                ${d==="assigned"?o`<span class="seg-count">${a}</span>`:l}
+              </button>`)}
+          </div>
+          <div class="spacer"></div>
+          <label class="select">
+            <span>${t("group_by")}</span>
+            <select
+              @change=${d=>this._groupBy=d.target.value}
+            >
+              ${["area","domain","none"].map(d=>o`<option value=${d} ?selected=${this._groupBy===d}>${t(`group_${d}`)}</option>`)}
+            </select>
+          </label>
+          <button
+            class="icon-btn ${this._showFilters?"active":""}"
+            title=${t("show_more")}
+            aria-label=${t("show_more")}
+            aria-expanded=${String(this._showFilters)}
+            @click=${()=>this._showFilters=!this._showFilters}
+          >
+            ${p(qe)}
+          </button>
+        </div>
+        <div class="chips">
+          ${[...ue,{id:"other",label:"cat_other",icon:W,domains:[]}].filter(d=>c.get(d.id)).map(d=>o`<button
+                class="chip"
+                aria-pressed=${String(this._categories.has(d.id))}
+                @click=${()=>{const g=new Set(this._categories);g.has(d.id)?g.delete(d.id):g.add(d.id),this._categories=g}}
+              >
+                ${p(d.icon)} ${t(d.label)} <span class="count">${c.get(d.id)}</span>
+              </button>`)}
+        </div>
+        ${this._showFilters?o`<div class="more-filters">
+              <label class="check">
+                <button
+                  class="switch"
+                  role="switch"
+                  aria-checked=${String(this._showHidden)}
+                  @click=${()=>this._showHidden=!this._showHidden}
+                ></button>
+                ${t("show_hidden")}
+              </label>
+              <label class="check">
+                <button
+                  class="switch"
+                  role="switch"
+                  aria-checked=${String(this._showUnsupported)}
+                  @click=${()=>this._showUnsupported=!this._showUnsupported}
+                ></button>
+                ${t("show_unsupported")}
+              </label>
+            </div>`:l}
+      </section>
+
+      <div class="list-meta">
+        <span>${t("showing",{shown:s.length,total:i.length})}</span>
+        ${h?o`<button class="btn small" @click=${this._resetFilters}>${t("reset_filters")}</button>`:l}
+      </div>
+
+      ${s.length?r.map(d=>this._renderGroup(d,e)):o`<div class="card message">${p(pe)}<div>${t("no_results")}</div></div>`}
+      ${this._renderApplyBar()}
+    `}_renderGroup(e,t){const i=this._t,s=this._collapsed.has(e.key)&&!this._search,r=e.entities.filter(d=>this._draft.has(d.entity_id)).length,a=e.entities.filter(d=>d.supported),c=a.length>0&&a.every(d=>this._draft.has(d.entity_id)),h=()=>{const d=new Set(this._collapsed);d.has(e.key)?d.delete(e.key):d.add(e.key),this._collapsed=d};return o`
+      <section class="card group">
+        <header class="group-head">
+          <button class="group-toggle" aria-expanded=${String(!s)} @click=${h}>
+            <span class="chev ${s?"collapsed":""}">${p(qt)}</span>
+            ${e.icon?o`<span class="group-icon">${p(e.icon)}</span>`:l}
+            <span class="group-title">${e.label}</span>
+            <span class="group-count">${i("in_group",{count:r,total:e.entities.length})}</span>
+          </button>
+          <button
+            class="btn small ${c?"":"tonal"}"
+            ?disabled=${!!this._busy||!c&&!a.length}
+            @click=${()=>this._toggleGroup(e.entities,!c)}
+          >
+            ${i(c?"remove_all":"add_all")}
+          </button>
+        </header>
+        ${s?l:o`<div class="rows">${e.entities.map(d=>this._renderRow(d,t))}</div>`}
+      </section>
+    `}_stateIcon(e,t){return t&&customElements.get("ha-state-icon")?o`<ha-state-icon .hass=${this.hass} .stateObj=${t}></ha-state-icon>`:e.icon&&customElements.get("ha-icon")?o`<ha-icon .icon=${e.icon}></ha-icon>`:p(Se(e.domain))}_renderRow(e,t){const i=this._t,s=this._draft.has(e.entity_id),r=t.entities.includes(e.entity_id),a=s!==r?s?"adding":"removing":"",c=this._options(e.entity_id),h=!ce(t.entity_config[e.entity_id],c),d=this.hass.states[e.entity_id],g=O(ut(e.domain,c.type)??e.accessory_type,e.domain,e.device_class,this._german),u=e.bridges.filter(m=>m!==t.entry_id).map(m=>this._instance(m)).filter(m=>!!m&&m.mode==="bridge").map(m=>m.name),_=this._accessoryFor(e.entity_id),b=d?this.hass.formatEntityState?.(d)??d.state:"",A=()=>this._dialog={kind:"entity",entityId:e.entity_id};return o`
+      <div
+        class="row ${s?"on":""} ${a}"
+        role="button"
+        tabindex="0"
+        @click=${A}
+        @keydown=${m=>{m.key==="Enter"&&A()}}
+      >
+        <div class="row-icon">${this._stateIcon(e,d)}</div>
+        <div class="row-main">
+          <div class="row-title">
+            <span class="name">${c.name||e.name}</span>
+            ${c.name?o`<span class="orig">${e.name}</span>`:l}
+          </div>
+          <div class="row-sub">
+            ${this._groupBy!=="area"&&e.area?o`<span>${e.area}</span><span class="sep">·</span>`:l}
+            <span class="mono">${e.entity_id}</span>
+          </div>
+          <div class="row-badges">
+            ${g?o`<span class="badge ${s?"primary":""}">${g}</span>`:l}
+            ${e.supported?l:o`<span class="badge error">${p(at)}${i("badge_unsupported")}</span>`}
+            ${_?o`<span class="badge primary">${p(v)}${i("badge_is_accessory")}</span>`:e.needs_accessory_mode?o`<span class="badge warning">${i("badge_accessory_mode")}</span>`:l}
+            ${e.hidden?o`<span class="badge">${i("badge_hidden")}</span>`:l}
+            ${e.entity_category?o`<span class="badge">${i("badge_diagnostic")}</span>`:l}
+            ${u.map(m=>o`<span class="badge">${i("badge_other_bridge",{name:m})}</span>`)}
+            ${a?o`<span class="badge ${a==="adding"?"success":"error"}">
+                  ${p(a==="adding"?Kt:q)}
+                  ${i(a==="adding"?"badge_new":"badge_removed")}
+                </span>`:l}
+            ${h?o`<span class="badge success">${p(K)}${i("pending_config",{count:1})}</span>`:l}
+          </div>
+        </div>
+        <div class="row-state">${b}</div>
+        <button
+          class="switch"
+          role="switch"
+          aria-checked=${String(s)}
+          aria-label=${e.name}
+          ?disabled=${!!this._busy}
+          @click=${m=>{m.stopPropagation(),this._toggle(e.entity_id)}}
+          @keydown=${m=>m.stopPropagation()}
+        ></button>
+      </div>
+    `}_renderApplyBar(){const e=this._t,{added:t,removed:i,config:s}=this._changes;if(!(t.length+i.length+s.length>0)&&!this._busy)return l;const a=this._entities.max_accessories,c=this._draft.size>a&&t.length>0;return o`
+      <div class="apply-bar ${this._busy?"busy":""}">
+        ${this._busy?o`<div class="spinner"></div><div class="apply-text">${this._busy}</div>`:o`
+              <div class="apply-text">
+                <div class="apply-summary">
+                  ${t.length?o`<span class="badge success">${p(F)}${e("pending_add",{count:t.length})}</span>`:l}
+                  ${i.length?o`<span class="badge error">${p(q)}${e("pending_remove",{count:i.length})}</span>`:l}
+                  ${s.length?o`<span class="badge primary">${p(K)}${e("pending_config",{count:s.length})}</span>`:l}
+                </div>
+                <div class="apply-hint">${c?e("too_many",{max:a}):e("apply_hint")}</div>
+              </div>
+              <button class="btn outlined" @click=${()=>this._resetDraft()}>${e("discard")}</button>
+              <button class="btn filled" ?disabled=${c} @click=${()=>this._apply()}>
+                ${p(Ft)} ${e("apply")}
+              </button>
+            `}
+      </div>
+    `}_renderDialog(){const e=this._dialog;if(!e)return l;const t=()=>{this._dialog=this._nextDialog,this._nextDialog=null},i=this._t;switch(e.kind){case"confirm":return o`<hkm-confirm
+          .heading=${e.heading}
+          .text=${e.text}
+          .confirmLabel=${e.confirmLabel}
+          .cancelLabel=${i("cancel")}
+          ?danger=${e.danger}
+          @confirm=${()=>e.action()}
+          @closed=${t}
+        ></hkm-confirm>`;case"new":return o`<hkm-new-dialog
+          .t=${i}
+          @choose=${s=>{this._nextDialog=s.detail==="accessory"?{kind:"add-accessory"}:{kind:"create"}}}
+          @closed=${t}
+        ></hkm-new-dialog>`;case"add-accessory":{const s=new Set(this._accessories.map(c=>c.entity_id)),r={};for(const c of this._bridges??[])r[c.entry_id]=c.name;const a=(this._entities?.entities??[]).filter(c=>c.supported&&!s.has(c.entity_id));return o`<hkm-accessory-picker
+          .hass=${this.hass}
+          .t=${i}
+          ?german=${this._german}
+          .entities=${a}
+          .bridgeNames=${r}
+          .preselected=${e.entityId??null}
+          @create-accessory=${c=>this._createAccessory(c.detail.entityId,c.detail.name,c.detail.removeFromBridges)}
+          @closed=${t}
+        ></hkm-accessory-picker>`}case"create":return o`<hkm-bridge-form
+          .t=${i}
+          mode="create"
+          .name=${this._bridges?.length?"":"HA Bridge"}
+          @submit-form=${s=>this._create(s.detail.name)}
+          @closed=${t}
+        ></hkm-bridge-form>`;case"settings":{const s=this._instance(e.entryId);return s?o`<hkm-bridge-form
+          .t=${i}
+          mode="settings"
+          .name=${s.name}
+          .port=${s.port}
+          @submit-form=${r=>this._saveSettings(s.entry_id,r.detail.name,r.detail.port!==s.port?r.detail.port:void 0)}
+          @closed=${t}
+        ></hkm-bridge-form>`:l}case"entity":{const s=this._bridge,r=this._entities?.entities.find(h=>h.entity_id===e.entityId);if(!s||!r)return l;const a=r.bridges.filter(h=>h!==s.entry_id).map(h=>this._instance(h)?.name).filter(h=>!!h),c=!this._accessoryFor(r.entity_id)&&r.supported;return o`<hkm-entity-dialog
+          .hass=${this.hass}
+          .t=${i}
+          ?german=${this._german}
+          .entity=${r}
+          .assigned=${this._draft.has(r.entity_id)}
+          .options=${this._options(r.entity_id)}
+          .typeOptions=${this._entities?.type_options[r.domain]}
+          .otherBridges=${a}
+          ?canBeAccessory=${c}
+          @make-accessory=${h=>{this._nextDialog={kind:"add-accessory",entityId:h.detail.entityId}}}
+          @save-entity=${h=>{const{entityId:d,assigned:g,options:u}=h.detail;this._toggle(d,g),ce(this._options(d),u)||(this._draftConfig={...this._draftConfig,[d]:u})}}
+          @closed=${t}
+        ></hkm-entity-dialog>`}}return l}};ie.properties={narrow:{type:Boolean},panel:{attribute:!1},_bridges:{state:!0},_instances:{state:!0},_accessories:{state:!0},_selected:{state:!0},_entities:{state:!0},_pairing:{state:!0},_draft:{state:!0},_draftConfig:{state:!0},_search:{state:!0},_view:{state:!0},_groupBy:{state:!0},_categories:{state:!0},_showHidden:{state:!0},_showUnsupported:{state:!0},_showFilters:{state:!0},_collapsed:{state:!0},_busy:{state:!0},_dialog:{state:!0},_loadError:{state:!0}},ie.styles=[L,V,y`
+      :host {
+        display: flex;
+        flex-direction: column;
+        /* Since HA 2026.x the panel wrapper has no fixed height; a panel always
+           spans the full viewport height, so size against the viewport. */
+        height: 100vh;
+        height: 100dvh;
+        background: var(--hkm-bg);
+        color: var(--hkm-text);
+        font-family: var(--ha-font-family-body, var(--paper-font-body1_-_font-family, Roboto, sans-serif));
+        -webkit-font-smoothing: antialiased;
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        flex: none;
+        height: var(--header-height, 56px);
+        padding: 0 8px 0 4px;
+        box-sizing: border-box;
+        background: var(--app-header-background-color, var(--hkm-card));
+        color: var(--app-header-text-color, var(--hkm-text));
+        border-bottom: var(--app-header-border-bottom, 1px solid var(--hkm-divider));
+        padding-top: env(safe-area-inset-top);
+      }
+      .toolbar-title {
+        flex: 1;
+        margin-left: 12px;
+        font-size: 20px;
+        font-weight: 400;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .scroller {
+        flex: 1;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+      }
+      .content {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 20px 16px calc(32px + env(safe-area-inset-bottom));
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .card {
+        background: var(--hkm-card);
+        border-radius: var(--hkm-radius);
+        box-shadow: var(--hkm-shadow);
+        border: var(--ha-card-border-width, 1px) solid var(--ha-card-border-color, var(--hkm-divider));
+      }
+      .loading,
+      .message {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 48px 16px;
+        color: var(--hkm-text-2);
+      }
+      .message svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+      }
+      .error-card {
+        color: var(--hkm-error);
+        flex-wrap: wrap;
+      }
+      .spacer {
+        flex: 1;
+      }
+
+      /* Empty state */
+      .empty {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 56px 24px 48px;
+        margin-top: 24px;
+      }
+      .empty h2 {
+        margin: 28px 0 8px;
+        font-size: 24px;
+        font-weight: 600;
+      }
+      .empty p {
+        margin: 0 0 28px;
+        max-width: 440px;
+        color: var(--hkm-text-2);
+        line-height: 1.55;
+      }
+      .empty-art {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 160px;
+        height: 160px;
+      }
+      .empty-ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle, var(--hkm-tint-strong) 0%, var(--hkm-tint) 45%, transparent 70%);
+      }
+
+      .bridge-tile {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 56px;
+        height: 56px;
+        border-radius: 16px;
+        color: #fff;
+        background: linear-gradient(
+          135deg,
+          color-mix(in srgb, var(--hkm-primary) 85%, white),
+          color-mix(in srgb, var(--hkm-primary) 70%, #6d28d9)
+        );
+        box-shadow: 0 6px 16px color-mix(in srgb, var(--hkm-primary) 35%, transparent);
+      }
+      .bridge-tile svg {
+        width: 30px;
+        height: 30px;
+        fill: currentColor;
+      }
+      .bridge-tile.large {
+        position: relative;
+        width: 88px;
+        height: 88px;
+        border-radius: 26px;
+      }
+      .bridge-tile.large svg {
+        width: 48px;
+        height: 48px;
+      }
+
+      /* Tabs */
+      .tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding: 2px;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar {
+        display: none;
+      }
+      .tab {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 38px;
+        padding: 0 14px;
+        border-radius: 999px;
+        border: 1px solid var(--hkm-divider);
+        background: var(--hkm-card);
+        cursor: pointer;
+        font-size: 14px;
+        white-space: nowrap;
+        transition: background-color 0.15s ease;
+      }
+      .tab:hover {
+        background: var(--hkm-surface-2);
+      }
+      .tab[aria-selected="true"] {
+        background: var(--hkm-text);
+        color: var(--hkm-card);
+        border-color: transparent;
+      }
+      .tab-count {
+        font-size: 12px;
+        opacity: 0.7;
+        font-variant-numeric: tabular-nums;
+      }
+      .tab.add {
+        color: var(--hkm-primary);
+        border-style: dashed;
+      }
+      .tab.add svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex: none;
+        background: var(--hkm-text-2);
+      }
+      .dot.ok {
+        background: var(--hkm-success);
+      }
+      .dot.ready {
+        background: var(--hkm-warning);
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--hkm-warning) 60%, transparent);
+        animation: pulse 2s infinite;
+      }
+      .dot.busy {
+        background: var(--hkm-primary);
+        animation: pulse 1.2s infinite;
+      }
+      .dot.bad {
+        background: var(--hkm-error);
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 0%, transparent);
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.55;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* Hero */
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 380px);
+        overflow: hidden;
+      }
+      .hero-main {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 24px;
+        min-width: 0;
+      }
+      .hero-head {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-width: 0;
+      }
+      .hero-titles {
+        min-width: 0;
+      }
+      h1 {
+        margin: 0 0 6px;
+        font-size: 26px;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+        line-height: 1.15;
+        overflow-wrap: anywhere;
+      }
+      .hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 14px;
+        font-size: 13px;
+        color: var(--hkm-text-2);
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+        color: var(--hkm-text);
+      }
+      .capacity-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--hkm-text-2);
+        margin-bottom: 8px;
+        font-variant-numeric: tabular-nums;
+      }
+      .meter {
+        height: 8px;
+        border-radius: 999px;
+        background: var(--hkm-surface-3);
+        overflow: hidden;
+      }
+      .meter > div {
+        height: 100%;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--hkm-primary), color-mix(in srgb, var(--hkm-primary) 60%, #6d28d9));
+        transition: width 0.35s ease;
+      }
+      .meter.over > div {
+        background: var(--hkm-error);
+      }
+      .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: auto;
+      }
+
+      /* Pairing */
+      .pairing {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 24px;
+        background: var(--hkm-surface-2);
+        border-left: 1px solid var(--hkm-divider);
+      }
+      .pairing-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 15px;
+      }
+      .pairing-title svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--hkm-primary);
+      }
+      .pairing-body {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .qr {
+        width: 112px;
+        height: 112px;
+        flex: none;
+        padding: 6px;
+        border-radius: 14px;
+        background: #fff;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+        image-rendering: pixelated;
+      }
+      .code-box {
+        min-width: 0;
+      }
+      .code-label {
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .code {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 4px 0 8px;
+        padding: 4px 10px 4px 0;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-family: var(--code-font-family, ui-monospace, SFMono-Regular, Menlo, monospace);
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+        color: var(--hkm-text);
+        border-radius: 8px;
+      }
+      .code svg {
+        width: 16px;
+        height: 16px;
+        fill: var(--hkm-text-2);
+      }
+      .code:hover svg {
+        fill: var(--hkm-primary);
+      }
+      .pairing p {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--hkm-text-2);
+      }
+      .pairing.paired,
+      .pairing.pending {
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .paired-icon {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--hkm-success) 15%, transparent);
+      }
+      .paired-icon svg {
+        width: 30px;
+        height: 30px;
+        fill: var(--hkm-success);
+      }
+
+      /* Notices */
+      .notice {
+        display: flex;
+        gap: 16px;
+        padding: 24px;
+      }
+      .notice-icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        background: var(--hkm-tint);
+      }
+      .notice-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: var(--hkm-primary);
+      }
+      .notice h3 {
+        margin: 0 0 6px;
+        font-size: 17px;
+      }
+      .notice p {
+        margin: 0 0 16px;
+        line-height: 1.55;
+        color: var(--hkm-text-2);
+      }
+
+      /* Filters */
+      .filters {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 8px;
+      }
+      .search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        height: 48px;
+        padding: 0 8px 0 16px;
+        border-radius: 999px;
+        background: var(--hkm-card);
+        border: 1px solid var(--hkm-divider);
+        box-shadow: var(--hkm-shadow);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+      .search:focus-within {
+        border-color: var(--hkm-primary);
+        box-shadow: 0 0 0 3px var(--hkm-tint);
+      }
+      .search > svg {
+        width: 22px;
+        height: 22px;
+        fill: var(--hkm-text-2);
+        flex: none;
+      }
+      .search input {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--hkm-text);
+        font: inherit;
+        font-size: 15px;
+      }
+      .search input::-webkit-search-cancel-button {
+        display: none;
+      }
+      .icon-btn.small {
+        width: 32px;
+        height: 32px;
+      }
+      .icon-btn.small svg {
+        width: 18px;
+        height: 18px;
+      }
+      .icon-btn.active {
+        background: var(--hkm-tint);
+        color: var(--hkm-primary);
+      }
+      .filter-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .segmented {
+        display: inline-flex;
+        padding: 3px;
+        border-radius: 999px;
+        background: var(--hkm-surface-3);
+      }
+      .segmented button {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 32px;
+        padding: 0 14px;
+        border: none;
+        border-radius: 999px;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--hkm-text-2);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .segmented button[aria-pressed="true"] {
+        background: var(--hkm-card);
+        color: var(--hkm-text);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      }
+      .seg-count {
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        box-sizing: border-box;
+        border-radius: 999px;
+        background: var(--hkm-primary);
+        color: var(--hkm-on-primary);
+        font-size: 11px;
+        line-height: 18px;
+        text-align: center;
+      }
+      .select {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: var(--hkm-text-2);
+      }
+      .select select {
+        font: inherit;
+        font-size: 13px;
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 10px;
+        border: 1px solid var(--hkm-divider);
+        background: var(--hkm-card);
+        color: var(--hkm-text);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      .chips::-webkit-scrollbar {
+        display: none;
+      }
+      .more-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 28px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: var(--hkm-surface-2);
+      }
+      .check {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .list-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 32px;
+        padding: 0 4px;
+        font-size: 13px;
+        color: var(--hkm-text-2);
+      }
+
+      /* Groups & rows */
+      .group {
+        overflow: hidden;
+      }
+      .group-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px 8px 8px;
+        border-bottom: 1px solid var(--hkm-divider);
+      }
+      .group-toggle {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        height: 40px;
+        padding: 0 8px;
+        border: none;
+        border-radius: 10px;
+        background: none;
+        cursor: pointer;
+        text-align: left;
+      }
+      .group-toggle:hover {
+        background: var(--hkm-surface-2);
+      }
+      .chev svg,
+      .group-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: var(--hkm-text-2);
+        display: block;
+      }
+      .chev {
+        transition: transform 0.2s ease;
+      }
+      .chev.collapsed {
+        transform: rotate(-90deg);
+      }
+      .group-title {
+        font-weight: 600;
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .group-count {
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        white-space: nowrap;
+        font-variant-numeric: tabular-nums;
+      }
+      .rows {
+        display: flex;
+        flex-direction: column;
+      }
+      .row {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        cursor: pointer;
+        content-visibility: auto;
+        contain-intrinsic-size: auto 72px;
+        transition: background-color 0.12s ease;
+      }
+      .row + .row {
+        border-top: 1px solid color-mix(in srgb, var(--hkm-divider) 60%, transparent);
+      }
+      .row:hover {
+        background: var(--hkm-surface-2);
+      }
+      .row:focus-visible {
+        outline: 2px solid var(--hkm-primary);
+        outline-offset: -2px;
+      }
+      .row::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 10px;
+        bottom: 10px;
+        width: 3px;
+        border-radius: 0 3px 3px 0;
+        background: transparent;
+      }
+      .row.adding::before {
+        background: var(--hkm-success);
+      }
+      .row.removing::before {
+        background: var(--hkm-error);
+      }
+      .row-icon {
+        display: grid;
+        place-items: center;
+        flex: none;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: var(--hkm-surface-3);
+        color: var(--hkm-text-2);
+        --mdc-icon-size: 22px;
+        transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      .row-icon svg {
+        width: 22px;
+        height: 22px;
+        fill: currentColor;
+      }
+      .row-icon.on,
+      .row.on .row-icon {
+        background: var(--hkm-tint);
+        color: var(--hkm-primary);
+      }
+      .row-main {
+        flex: 1;
+        min-width: 0;
+      }
+      .row-title {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        min-width: 0;
+      }
+      .name {
+        font-weight: 500;
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .orig {
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .row-sub {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+        font-size: 12px;
+        color: var(--hkm-text-2);
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      .row-sub .sep {
+        opacity: 0.6;
+      }
+      .mono {
+        font-family: var(--code-font-family, ui-monospace, SFMono-Regular, Menlo, monospace);
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .row-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 6px;
+      }
+      .row-badges:empty {
+        display: none;
+      }
+      .row-state {
+        flex: none;
+        max-width: 140px;
+        font-size: 13px;
+        color: var(--hkm-text-2);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: right;
+      }
+
+      /* Apply bar */
+      .apply-bar {
+        position: sticky;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 4px;
+        padding: 12px 12px 12px 20px;
+        border-radius: 20px;
+        background: color-mix(in srgb, var(--hkm-card) 88%, transparent);
+        backdrop-filter: blur(12px) saturate(1.4);
+        -webkit-backdrop-filter: blur(12px) saturate(1.4);
+        border: 1px solid var(--hkm-divider);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+        animation: slide-up 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      }
+      @keyframes slide-up {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+      }
+      .apply-text {
+        flex: 1;
+        min-width: 0;
+      }
+      .apply-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .apply-summary .badge {
+        height: 24px;
+        font-size: 12px;
+      }
+      .apply-hint {
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--hkm-text-2);
+      }
+      .apply-bar.busy {
+        padding: 18px 20px;
+      }
+      .apply-bar.busy .apply-text {
+        font-weight: 500;
+      }
+      .spinner.small {
+        width: 16px;
+        height: 16px;
+        border-width: 2px;
+        border-color: rgba(255, 255, 255, 0.4);
+        border-top-color: #fff;
+      }
+
+      /* Standalone accessories */
+      .tab svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+      .tab-sep {
+        flex: none;
+        width: 1px;
+        margin: 6px 2px;
+        background: var(--hkm-divider);
+      }
+      .accessories-intro .notice-icon {
+        background: color-mix(in srgb, #ff7043 16%, transparent);
+      }
+      .accessories-intro .notice-icon svg {
+        fill: #f4511e;
+      }
+      .acc-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 16px;
+      }
+      .acc-card {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        padding: 18px;
+      }
+      .acc-head {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+      .acc-titles {
+        min-width: 0;
+      }
+      .acc-name {
+        font-weight: 600;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .acc-titles .mono {
+        display: block;
+        font-size: 12px;
+        color: var(--hkm-text-2);
+      }
+      .acc-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+      }
+      .acc-pairing {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px;
+        border-radius: 14px;
+        background: var(--hkm-surface-2);
+      }
+      .acc-pairing.pending {
+        font-size: 13px;
+        color: var(--hkm-text-2);
+      }
+      .qr.small {
+        width: 84px;
+        height: 84px;
+        padding: 4px;
+        border-radius: 10px;
+      }
+      .acc-paired {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--hkm-success) 12%, transparent);
+        font-weight: 500;
+        font-size: 14px;
+      }
+      .acc-paired svg {
+        width: 22px;
+        height: 22px;
+        fill: var(--hkm-success);
+      }
+      .acc-actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: auto;
+        color: var(--hkm-text-2);
+      }
+      .empty-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+      }
+      .empty-hint {
+        margin: 18px 0 0 !important;
+        font-size: 13px;
+      }
+
+      /* Narrow / mobile */
+      @media (max-width: 760px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .pairing {
+          border-left: none;
+          border-top: 1px solid var(--hkm-divider);
+        }
+        .row-state {
+          display: none;
+        }
+      }
+      @media (max-width: 520px) {
+        .content {
+          padding: 12px 10px calc(24px + env(safe-area-inset-bottom));
+          gap: 12px;
+        }
+        .hero-main,
+        .pairing,
+        .notice {
+          padding: 18px;
+        }
+        h1 {
+          font-size: 22px;
+        }
+        .bridge-tile {
+          width: 48px;
+          height: 48px;
+        }
+        .row {
+          padding: 12px;
+          gap: 12px;
+        }
+        .apply-bar {
+          flex-wrap: wrap;
+          padding: 12px;
+        }
+        .apply-bar .apply-text {
+          flex-basis: 100%;
+        }
+        .apply-bar .btn {
+          flex: 1;
+        }
+        .select span {
+          display: none;
+        }
+        .chips {
+          flex-wrap: nowrap;
+        }
+        .pairing-body {
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+        .group-count {
+          display: none;
+        }
+      }
+    `];let $e=ie;customElements.get("homekit-manager-panel")||customElements.define("homekit-manager-panel",$e);

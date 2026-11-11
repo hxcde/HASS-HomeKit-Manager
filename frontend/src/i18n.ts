@@ -1,0 +1,387 @@
+/** Minimal i18n: German and English. */
+
+const en = {
+  title: "HomeKit Manager",
+  loading: "Loading…",
+  refresh: "Refresh",
+  new_bridge: "New bridge",
+  // Empty state
+  empty_title: "No HomeKit bridge yet",
+  empty_text:
+    "Create a bridge, pick your devices and add it to the Home app on your iPhone. No YAML required.",
+  empty_action: "Create bridge",
+  // Bridge card
+  status_running_paired: "Paired with Apple Home",
+  status_running_unpaired: "Ready to pair",
+  status_starting: "Starting…",
+  status_stopped: "Stopped",
+  status_not_loaded: "Not loaded",
+  status_retry: "Retrying…",
+  status_error: "Error",
+  status_disabled: "Disabled",
+  status_unknown: "Unknown",
+  port: "Port {port}",
+  accessories_active: "{count} accessories active",
+  capacity: "{count} of {max} slots used",
+  pair_title: "Add to Apple Home",
+  pair_steps:
+    "Open the Home app, tap + → Add Accessory and scan the code. Or enter the setup code manually.",
+  setup_code: "Setup code",
+  paired_title: "Connected",
+  paired_text: "This bridge is paired with {count} Apple device(s). New entities appear in the Home app automatically.",
+  pairing_unavailable: "Pairing information is available once the bridge is running.",
+  copy: "Copy",
+  copied: "Setup code copied",
+  action_settings: "Settings",
+  action_restart: "Restart",
+  action_unpair: "Reset pairing",
+  action_delete: "Delete",
+  // Unmanaged
+  unmanaged_title: "This bridge uses domain filters",
+  unmanaged_text:
+    "It was set up with the built-in HomeKit dialog and exposes entities by domain ({filter}). Adopt it to pick entities one by one. The {count} entities exposed right now stay on the bridge; new entities will no longer be added automatically.",
+  adopt: "Adopt bridge",
+  yaml_title: "Configured in YAML",
+  yaml_text:
+    "This bridge is defined in configuration.yaml. Its entities can only be changed there.",
+  // Toolbar / filters
+  search: "Search entities, areas, devices…",
+  view_all: "All",
+  view_assigned: "In HomeKit",
+  view_unassigned: "Not in HomeKit",
+  group_by: "Group by",
+  group_area: "Area",
+  group_domain: "Type",
+  group_none: "None",
+  show_more: "More filters",
+  show_hidden: "Show hidden & diagnostic entities",
+  show_unsupported: "Show entities HomeKit does not support",
+  showing: "Showing {shown} of {total} entities",
+  no_results: "No entities match your filters.",
+  reset_filters: "Reset filters",
+  no_area: "No area",
+  add_all: "Add all",
+  remove_all: "Remove all",
+  in_group: "{count} of {total} in HomeKit",
+  // Row badges
+  badge_new: "will be added",
+  badge_removed: "will be removed",
+  badge_hidden: "hidden",
+  badge_diagnostic: "diagnostic",
+  badge_unsupported: "not supported",
+  badge_accessory_mode: "own accessory recommended",
+  badge_other_bridge: "also on {name}",
+  badge_custom_name: "as “{name}”",
+  // Apply bar
+  pending_add: "{count} to add",
+  pending_remove: "{count} to remove",
+  pending_config: "{count} settings changed",
+  discard: "Discard",
+  apply: "Apply",
+  applying: "Applying… the bridge restarts for a moment.",
+  applied: "HomeKit bridge updated",
+  apply_hint: "The bridge restarts briefly when you apply changes.",
+  too_many: "A bridge can hold at most {max} accessories. Remove some entities or create a second bridge.",
+  // Entity dialog
+  entity_in_bridge: "Expose on this bridge",
+  homekit_name: "Name in HomeKit",
+  homekit_name_helper: "Leave empty to use the Home Assistant name.",
+  accessory_type: "Accessory type",
+  accessory_type_auto: "Automatic ({type})",
+  info_type: "HomeKit type",
+  info_area: "Area",
+  info_device: "Device",
+  info_integration: "Integration",
+  info_state: "State",
+  info_entity_id: "Entity ID",
+  open_more_info: "Open in Home Assistant",
+  warn_unsupported:
+    "HomeKit has no matching accessory for this entity (for sensors only temperature, humidity, air quality, CO, CO₂ and light are supported). It will not show up in the Home app.",
+  warn_accessory_mode:
+    "Apple recommends pairing cameras, locks, TVs and activity remotes as separate accessories. On a bridge they work, but some features may be limited.",
+  warn_type_reset:
+    "Changing the type recreates the accessory in the Home app (room and scenes need to be set again).",
+  done: "Done",
+  cancel: "Cancel",
+  close: "Close",
+  save: "Save",
+  create: "Create",
+  // Settings / create
+  settings_title: "Bridge settings",
+  create_title: "New HomeKit bridge",
+  create_text: "The bridge starts empty. You can add entities right after creating it.",
+  bridge_name: "Name",
+  bridge_name_helper: "Shown in the Home app (3–25 characters, A–Z, digits, spaces).",
+  bridge_port: "Port",
+  bridge_port_helper: "TCP port of the HomeKit server. Only change it if you know you need to.",
+  creating: "Creating bridge…",
+  created: "Bridge “{name}” created",
+  saving: "Saving… the bridge restarts for a moment.",
+  saved: "Settings saved",
+  // Confirms
+  confirm_delete_title: "Delete “{name}”?",
+  confirm_delete_text:
+    "The bridge and all its accessories are removed from Home Assistant and from Apple Home. Rooms, scenes and automations in the Home app that use them are lost.",
+  confirm_unpair_title: "Reset pairing?",
+  confirm_unpair_text:
+    "All Apple devices are disconnected from this bridge. Afterwards you can add it to the Home app again with the setup code.",
+  confirm_adopt_title: "Adopt “{name}”?",
+  confirm_adopt_text:
+    "The domain filter is converted into a fixed list of the {count} entities exposed right now. Pairing stays intact.",
+  confirm_discard_title: "Discard changes?",
+  confirm_discard_text: "You have changes that were not applied yet.",
+  deleted: "Bridge deleted",
+  unpaired: "Pairing reset. You can pair the bridge again now.",
+  restarted: "Bridge restarted",
+  adopted: "Bridge adopted",
+  error: "Error: {message}",
+  // Accessory mode (standalone accessories)
+  new_instance: "Add",
+  new_title: "What do you want to add?",
+  new_bridge_title: "HomeKit bridge",
+  new_bridge_text:
+    "Many devices with one pairing. Ideal for lights, switches, sensors, climate and covers (up to 149 devices).",
+  new_accessory_title: "Standalone accessory",
+  new_accessory_text:
+    "One device with its own pairing. Needed for TVs, receivers, projectors, cameras, locks and activity remotes.",
+  accessories_tab: "Accessories",
+  accessories_hint: "Devices paired on their own (TVs, cameras, locks …)",
+  accessories_title: "Standalone accessories",
+  accessories_text:
+    "Apple Home only shows TVs, receivers and projectors with inputs and remote, cameras with live video and locks reliably when they are paired as their own accessory. Every device gets its own setup code.",
+  accessories_empty: "No standalone accessories yet.",
+  add_accessory: "Add device",
+  empty_action_accessory: "Add TV or camera",
+  empty_hint_accessory:
+    "TVs, cameras and locks are added as standalone accessories with their own setup code.",
+  badge_is_accessory: "standalone accessory",
+  make_accessory: "Pair as standalone accessory",
+  creating_accessory: "Creating accessory…",
+  created_accessory: "“{name}” created. Pair it with its setup code.",
+  confirm_delete_accessory_text:
+    "The accessory is removed from Apple Home. Rooms, scenes and automations in the Home app that use it are lost.",
+  picker_title: "Add standalone accessory",
+  picker_text:
+    "Pick the device. Recommended are devices that Apple Home only fully supports as standalone accessory.",
+  picker_recommended: "Recommended",
+  picker_others: "All other devices",
+  picker_change: "Change",
+  picker_remove: "Remove from bridges",
+  picker_remove_named: "Remove from {names} (otherwise it shows up twice in the Home app)",
+  picker_not_needed:
+    "This device ({type}) also works on a bridge. A standalone accessory needs its own pairing.",
+  accessory_name_helper: "Shown in the Home app. A–Z, digits and spaces; umlauts are rewritten.",
+  // Categories
+  cat_light: "Lights",
+  cat_switch: "Switches",
+  cat_climate: "Climate",
+  cat_cover: "Covers & valves",
+  cat_sensor: "Sensors",
+  cat_security: "Security",
+  cat_media: "Media",
+  cat_scene: "Scenes & scripts",
+  cat_select: "Selects",
+  cat_appliance: "Appliances",
+  cat_presence: "Presence",
+  cat_other: "Other",
+};
+
+type Strings = typeof en;
+
+const de: Strings = {
+  title: "HomeKit Manager",
+  loading: "Wird geladen…",
+  refresh: "Aktualisieren",
+  new_bridge: "Neue Bridge",
+  empty_title: "Noch keine HomeKit Bridge",
+  empty_text:
+    "Lege eine Bridge an, wähle deine Geräte aus und füge sie in der Home-App auf dem iPhone hinzu. Ganz ohne YAML.",
+  empty_action: "Bridge anlegen",
+  status_running_paired: "Mit Apple Home gekoppelt",
+  status_running_unpaired: "Bereit zum Koppeln",
+  status_starting: "Startet…",
+  status_stopped: "Gestoppt",
+  status_not_loaded: "Nicht geladen",
+  status_retry: "Neuer Versuch…",
+  status_error: "Fehler",
+  status_disabled: "Deaktiviert",
+  status_unknown: "Unbekannt",
+  port: "Port {port}",
+  accessories_active: "{count} Geräte aktiv",
+  capacity: "{count} von {max} Plätzen belegt",
+  pair_title: "Zu Apple Home hinzufügen",
+  pair_steps:
+    "Öffne die Home-App, tippe auf + → Gerät hinzufügen und scanne den Code. Alternativ den Setup-Code manuell eingeben.",
+  setup_code: "Setup-Code",
+  paired_title: "Verbunden",
+  paired_text:
+    "Die Bridge ist mit {count} Apple-Gerät(en) gekoppelt. Neue Entitäten erscheinen automatisch in der Home-App.",
+  pairing_unavailable: "Kopplungsdaten sind verfügbar, sobald die Bridge läuft.",
+  copy: "Kopieren",
+  copied: "Setup-Code kopiert",
+  action_settings: "Einstellungen",
+  action_restart: "Neu starten",
+  action_unpair: "Kopplung zurücksetzen",
+  action_delete: "Löschen",
+  unmanaged_title: "Diese Bridge nutzt Domain-Filter",
+  unmanaged_text:
+    "Sie wurde mit dem eingebauten HomeKit-Dialog eingerichtet und gibt Entitäten nach Domain frei ({filter}). Übernimm sie, um Entitäten einzeln auszuwählen. Die {count} aktuell freigegebenen Entitäten bleiben erhalten, neue Entitäten werden danach nicht mehr automatisch hinzugefügt.",
+  adopt: "Bridge übernehmen",
+  yaml_title: "Per YAML konfiguriert",
+  yaml_text:
+    "Diese Bridge ist in der configuration.yaml definiert. Ihre Entitäten lassen sich nur dort ändern.",
+  search: "Entitäten, Bereiche, Geräte suchen…",
+  view_all: "Alle",
+  view_assigned: "In HomeKit",
+  view_unassigned: "Nicht in HomeKit",
+  group_by: "Gruppieren",
+  group_area: "Bereich",
+  group_domain: "Typ",
+  group_none: "Keine",
+  show_more: "Weitere Filter",
+  show_hidden: "Versteckte & Diagnose-Entitäten anzeigen",
+  show_unsupported: "Von HomeKit nicht unterstützte Entitäten anzeigen",
+  showing: "{shown} von {total} Entitäten",
+  no_results: "Keine Entitäten passen zu deinen Filtern.",
+  reset_filters: "Filter zurücksetzen",
+  no_area: "Ohne Bereich",
+  add_all: "Alle hinzufügen",
+  remove_all: "Alle entfernen",
+  in_group: "{count} von {total} in HomeKit",
+  badge_new: "wird hinzugefügt",
+  badge_removed: "wird entfernt",
+  badge_hidden: "versteckt",
+  badge_diagnostic: "Diagnose",
+  badge_unsupported: "nicht unterstützt",
+  badge_accessory_mode: "eigenes Zubehör empfohlen",
+  badge_other_bridge: "auch in {name}",
+  badge_custom_name: "als „{name}“",
+  pending_add: "{count} hinzufügen",
+  pending_remove: "{count} entfernen",
+  pending_config: "{count} Einstellungen geändert",
+  discard: "Verwerfen",
+  apply: "Übernehmen",
+  applying: "Wird übernommen… die Bridge startet kurz neu.",
+  applied: "HomeKit Bridge aktualisiert",
+  apply_hint: "Beim Übernehmen startet die Bridge kurz neu.",
+  too_many:
+    "Eine Bridge kann höchstens {max} Geräte enthalten. Entferne Entitäten oder lege eine zweite Bridge an.",
+  entity_in_bridge: "In dieser Bridge freigeben",
+  homekit_name: "Name in HomeKit",
+  homekit_name_helper: "Leer lassen, um den Namen aus Home Assistant zu verwenden.",
+  accessory_type: "Gerätetyp",
+  accessory_type_auto: "Automatisch ({type})",
+  info_type: "HomeKit-Typ",
+  info_area: "Bereich",
+  info_device: "Gerät",
+  info_integration: "Integration",
+  info_state: "Zustand",
+  info_entity_id: "Entitäts-ID",
+  open_more_info: "In Home Assistant öffnen",
+  warn_unsupported:
+    "HomeKit hat für diese Entität keinen passenden Gerätetyp (bei Sensoren nur Temperatur, Luftfeuchtigkeit, Luftqualität, CO, CO₂ und Helligkeit). Sie erscheint nicht in der Home-App.",
+  warn_accessory_mode:
+    "Apple empfiehlt, Kameras, Schlösser, Fernseher und Aktivitäts-Fernbedienungen als eigenständiges Zubehör zu koppeln. In einer Bridge funktionieren sie, aber teils eingeschränkt.",
+  warn_type_reset:
+    "Ein Typwechsel legt das Gerät in der Home-App neu an (Raum und Szenen müssen neu zugewiesen werden).",
+  done: "Fertig",
+  cancel: "Abbrechen",
+  close: "Schließen",
+  save: "Speichern",
+  create: "Anlegen",
+  settings_title: "Bridge-Einstellungen",
+  create_title: "Neue HomeKit Bridge",
+  create_text: "Die Bridge startet leer. Entitäten fügst du direkt danach hinzu.",
+  bridge_name: "Name",
+  bridge_name_helper: "Wird in der Home-App angezeigt (3–25 Zeichen, A–Z, Ziffern, Leerzeichen).",
+  bridge_port: "Port",
+  bridge_port_helper: "TCP-Port des HomeKit-Servers. Nur ändern, wenn nötig.",
+  creating: "Bridge wird angelegt…",
+  created: "Bridge „{name}“ angelegt",
+  saving: "Wird gespeichert… die Bridge startet kurz neu.",
+  saved: "Einstellungen gespeichert",
+  confirm_delete_title: "„{name}“ löschen?",
+  confirm_delete_text:
+    "Die Bridge und alle ihre Geräte werden aus Home Assistant und aus Apple Home entfernt. Räume, Szenen und Automationen der Home-App, die sie nutzen, gehen verloren.",
+  confirm_unpair_title: "Kopplung zurücksetzen?",
+  confirm_unpair_text:
+    "Alle Apple-Geräte werden von dieser Bridge getrennt. Danach kannst du sie mit dem Setup-Code erneut zur Home-App hinzufügen.",
+  confirm_adopt_title: "„{name}“ übernehmen?",
+  confirm_adopt_text:
+    "Der Domain-Filter wird in eine feste Liste der {count} aktuell freigegebenen Entitäten umgewandelt. Die Kopplung bleibt erhalten.",
+  confirm_discard_title: "Änderungen verwerfen?",
+  confirm_discard_text: "Es gibt Änderungen, die noch nicht übernommen wurden.",
+  deleted: "Bridge gelöscht",
+  unpaired: "Kopplung zurückgesetzt. Die Bridge kann jetzt neu gekoppelt werden.",
+  restarted: "Bridge neu gestartet",
+  adopted: "Bridge übernommen",
+  error: "Fehler: {message}",
+  new_instance: "Hinzufügen",
+  new_title: "Was möchtest du hinzufügen?",
+  new_bridge_title: "HomeKit Bridge",
+  new_bridge_text:
+    "Viele Geräte mit einer Kopplung. Ideal für Licht, Schalter, Sensoren, Klima und Rollläden (bis 149 Geräte).",
+  new_accessory_title: "Einzelgerät",
+  new_accessory_text:
+    "Ein Gerät mit eigener Kopplung. Nötig für Fernseher, Receiver, Projektoren, Kameras, Schlösser und Aktivitäts-Fernbedienungen.",
+  accessories_tab: "Einzelgeräte",
+  accessories_hint: "Eigenständig gekoppelte Geräte (Fernseher, Kameras, Schlösser …)",
+  accessories_title: "Einzelgeräte",
+  accessories_text:
+    "Fernseher, Receiver und Projektoren mit Eingängen und Fernbedienung, Kameras mit Livebild und Schlösser zeigt Apple Home nur zuverlässig an, wenn sie als eigenes Zubehör gekoppelt sind. Jedes Gerät bekommt einen eigenen Setup-Code.",
+  accessories_empty: "Noch keine Einzelgeräte.",
+  add_accessory: "Gerät hinzufügen",
+  empty_action_accessory: "Fernseher oder Kamera hinzufügen",
+  empty_hint_accessory:
+    "Fernseher, Kameras und Schlösser werden als Einzelgerät mit eigenem Setup-Code hinzugefügt.",
+  badge_is_accessory: "Einzelgerät",
+  make_accessory: "Als Einzelgerät koppeln",
+  creating_accessory: "Einzelgerät wird angelegt…",
+  created_accessory: "„{name}“ angelegt. Jetzt mit dem Setup-Code koppeln.",
+  confirm_delete_accessory_text:
+    "Das Gerät wird aus Apple Home entfernt. Räume, Szenen und Automationen der Home-App, die es nutzen, gehen verloren.",
+  picker_title: "Einzelgerät hinzufügen",
+  picker_text:
+    "Wähle das Gerät. Empfohlen sind Geräte, die Apple Home nur als Einzelgerät voll unterstützt.",
+  picker_recommended: "Empfohlen",
+  picker_others: "Alle weiteren Geräte",
+  picker_change: "Ändern",
+  picker_remove: "Aus Bridges entfernen",
+  picker_remove_named: "Aus {names} entfernen (sonst erscheint es doppelt in der Home-App)",
+  picker_not_needed:
+    "Dieses Gerät ({type}) funktioniert auch in einer Bridge. Als Einzelgerät braucht es eine eigene Kopplung.",
+  accessory_name_helper:
+    "Wird in der Home-App angezeigt. A–Z, Ziffern und Leerzeichen; Umlaute werden umgeschrieben.",
+  cat_light: "Licht",
+  cat_switch: "Schalter",
+  cat_climate: "Klima",
+  cat_cover: "Rollläden & Ventile",
+  cat_sensor: "Sensoren",
+  cat_security: "Sicherheit",
+  cat_media: "Medien",
+  cat_scene: "Szenen & Skripte",
+  cat_select: "Auswahl",
+  cat_appliance: "Haushalt",
+  cat_presence: "Anwesenheit",
+  cat_other: "Sonstiges",
+};
+
+export type StringKey = keyof Strings;
+
+export type Translate = (key: StringKey, vars?: Record<string, string | number>) => string;
+
+export const getTranslator = (language: string | undefined): Translate => {
+  const table: Strings = language?.toLowerCase().startsWith("de") ? de : en;
+  return (key, vars) => {
+    let text: string = table[key] ?? en[key] ?? key;
+    if (vars) {
+      for (const [name, value] of Object.entries(vars)) {
+        text = text.split(`{${name}}`).join(String(value));
+      }
+    }
+    return text;
+  };
+};
+
+export const isGerman = (language: string | undefined) =>
+  Boolean(language?.toLowerCase().startsWith("de"));

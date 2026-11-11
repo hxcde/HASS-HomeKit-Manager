@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    name: Attach zip
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check version matches tag
+        run: |
+          version=$(python3 -c "import json;print(json.load(open('custom_components/homekit_manager/manifest.json'))['version'])")
+          tag="${GITHUB_REF_NAME#v}"
+          test "$version" = "$tag" || { echo "manifest version $version != tag $tag"; exit 1; }
+      - name: Build zip
+        run: cd custom_components/homekit_manager && zip -r ../../homekit_manager.zip . -x "__pycache__/*"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: homekit_manager.zip
