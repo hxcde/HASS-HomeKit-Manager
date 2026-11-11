@@ -20,6 +20,7 @@ import {
   mdiRestart,
   mdiShieldCheckOutline,
   mdiTelevision,
+  mdiThermostatAuto,
   mdiTuneVariant,
 } from "@mdi/js";
 import {
@@ -77,6 +78,9 @@ type DialogState =
       confirmLabel: string;
       danger?: boolean;
       action: () => void | Promise<void>;
+      /** Second choice instead of "cancel". */
+      altLabel?: string;
+      alt?: () => void;
     };
 
 interface Group {
@@ -401,13 +405,102 @@ class HomeKitManagerPanel extends LitElement {
     this._draft = draft;
   }
 
+  /** Row switch: suggests the regulating entity for e.g. Better Thermostat TRVs. */
+  private _onSwitch(e: EntityInfo) {
+    const controller = this._draft.has(e.entity_id) ? undefined : this._controllerOf(e);
+    if (!controller) {
+      this._toggle(e.entity_id);
+      return;
+    }
+    const t = this._t;
+    const vars = {
+      name: e.name,
+      controller: controller.name,
+      integration: this._controllerTitle(controller.entity_id),
+    };
+    if (this._draft.has(controller.entity_id)) {
+      this._confirm(
+        t("controlled_duplicate_title", vars),
+        t("controlled_duplicate_text", vars),
+        t("controlled_duplicate_confirm"),
+        () => this._toggle(e.entity_id, true),
+      );
+      return;
+    }
+    this._dialog = {
+      kind: "confirm",
+      heading: t("controlled_title", vars),
+      text: t("controlled_text", vars),
+      confirmLabel: t("controlled_use", vars),
+      action: () => this._toggle(controller.entity_id, true),
+      altLabel: t("controlled_original"),
+      alt: () => this._toggle(e.entity_id, true),
+    };
+  }
+
   private _toggleGroup(entities: EntityInfo[], on: boolean) {
     const draft = new Set(this._draft);
+    let replaced = 0;
+    let integration = "";
     for (const e of entities) {
-      if (on && e.supported) draft.add(e.entity_id);
-      else if (!on) draft.delete(e.entity_id);
+      const controller = this._controllerOf(e);
+      if (on && e.supported) {
+        // Regulated thermostats join through their regulating entity
+        if (controller && !draft.has(e.entity_id)) {
+          if (!draft.has(controller.entity_id)) {
+            draft.add(controller.entity_id);
+            replaced++;
+            integration = this._controllerTitle(controller.entity_id);
+          }
+        } else {
+          draft.add(e.entity_id);
+        }
+      } else if (!on) {
+        draft.delete(e.entity_id);
+        if (controller) draft.delete(controller.entity_id);
+      }
     }
     this._draft = draft;
+    if (replaced) this._toast(this._t("controlled_replaced", { count: replaced, integration }));
+  }
+
+  private _replaceControlled(entities: EntityInfo[]) {
+    const draft = new Set(this._draft);
+    for (const e of entities) {
+      const controller = this._controllerOf(e);
+      if (!controller) continue;
+      draft.delete(e.entity_id);
+      draft.add(controller.entity_id);
+    }
+    this._draft = draft;
+  }
+
+  private _byId?: { source: EntitiesResponse; map: Map<string, EntityInfo> };
+
+  private _entity(entityId: string): EntityInfo | undefined {
+    const data = this._entities;
+    if (!data) return undefined;
+    if (this._byId?.source !== data) {
+      this._byId = { source: data, map: new Map(data.entities.map((e) => [e.entity_id, e])) };
+    }
+    return this._byId.map.get(entityId);
+  }
+
+  /** The entity regulating ``e`` (Better Thermostat …), if HomeKit supports it. */
+  private _controllerOf(e: EntityInfo): EntityInfo | undefined {
+    if (!e.controlled_by) return undefined;
+    const controller = this._entity(e.controlled_by);
+    return controller?.supported ? controller : undefined;
+  }
+
+  private _controllerTitle(entityId: string): string {
+    return this._entities?.controllers?.[entityId]?.title ?? entityId;
+  }
+
+  /** Assigned directly or through its regulating entity. */
+  private _isCovered(e: EntityInfo): boolean {
+    if (this._draft.has(e.entity_id)) return true;
+    return Boolean(e.controlled_by && this._draft.has(e.controlled_by) && this._controllerOf(e));
   }
 
   private async _apply() {
@@ -1117,8 +1210,25 @@ class HomeKitManagerPanel extends LitElement {
     const t = this._t;
     const missing = bridge.missing.filter((id) => this._draft.has(id));
     const unavailable = bridge.unavailable.filter((id) => !this.hass.states[id]);
-    if (!missing.length && !unavailable.length) return nothing;
+    const controlled = [...this._draft]
+      .map((id) => this._entity(id))
+      .filter((e): e is EntityInfo => Boolean(e && this._controllerOf(e)));
+    if (!missing.length && !unavailable.length && !controlled.length) return nothing;
+    const integration = controlled.length ? this._controllerTitle(controlled[0].controlled_by!) : "";
     return html`<section class="card health">
+      ${controlled.length
+        ? html`<div class="health-row">
+            <div class="health-icon">${icon(mdiThermostatAuto)}</div>
+            <div class="health-body">
+              <strong>${t("health_controlled_title", { count: controlled.length })}</strong>
+              <p>${t("health_controlled_text", { integration })}</p>
+              <div class="ids">${controlled.map((e) => html`<code>${e.name}</code>`)}</div>
+            </div>
+            <button class="btn small tonal" @click=${() => this._replaceControlled(controlled)}>
+              ${t("health_controlled_replace", { integration })}
+            </button>
+          </div>`
+        : nothing}
       ${missing.length
         ? html`<div class="health-row">
             <div class="health-icon">${icon(mdiAlertOutline)}</div>
@@ -1278,9 +1388,9 @@ class HomeKitManagerPanel extends LitElement {
   private _renderGroup(group: Group, bridge: Bridge) {
     const t = this._t;
     const collapsed = this._collapsed.has(group.key) && !this._search;
-    const on = group.entities.filter((e) => this._draft.has(e.entity_id)).length;
+    const on = group.entities.filter((e) => this._isCovered(e)).length;
     const selectable = group.entities.filter((e) => e.supported);
-    const allOn = selectable.length > 0 && selectable.every((e) => this._draft.has(e.entity_id));
+    const allOn = selectable.length > 0 && selectable.every((e) => this._isCovered(e));
     const toggleCollapse = () => {
       const next = new Set(this._collapsed);
       if (next.has(group.key)) next.delete(group.key);
@@ -1341,6 +1451,8 @@ class HomeKitManagerPanel extends LitElement {
       .filter((b): b is Bridge => Boolean(b) && b!.mode === "bridge")
       .map((b) => b.name);
     const ownAccessory = this._accessoryFor(e.entity_id);
+    const controller = this._controllerOf(e);
+    const regulates = this._entities?.controllers?.[e.entity_id];
     const stateText = stateObj
       ? this.hass.formatEntityState?.(stateObj) ?? stateObj.state
       : "";
@@ -1374,6 +1486,16 @@ class HomeKitManagerPanel extends LitElement {
               : e.needs_accessory_mode
                 ? html`<span class="badge warning">${t("badge_accessory_mode")}</span>`
                 : nothing}
+            ${controller
+              ? this._draft.has(controller.entity_id)
+                ? html`<span class="badge primary">
+                    ${icon(mdiThermostatAuto)}${t("controlled_via_badge", { integration: this._controllerTitle(controller.entity_id) })}
+                  </span>`
+                : html`<span class="badge warning">
+                    ${icon(mdiThermostatAuto)}${t("controlled_badge", { integration: this._controllerTitle(controller.entity_id) })}
+                  </span>`
+              : nothing}
+            ${regulates ? html`<span class="badge">${icon(mdiThermostatAuto)}${regulates.title}</span>` : nothing}
             ${e.hidden ? html`<span class="badge">${t("badge_hidden")}</span>` : nothing}
             ${e.entity_category ? html`<span class="badge">${t("badge_diagnostic")}</span>` : nothing}
             ${bridge.rule?.enabled && bridge.rule.members.includes(e.entity_id)
@@ -1398,7 +1520,7 @@ class HomeKitManagerPanel extends LitElement {
           ?disabled=${Boolean(this._busy)}
           @click=${(ev: Event) => {
             ev.stopPropagation();
-            this._toggle(e.entity_id);
+            this._onSwitch(e);
           }}
           @keydown=${(ev: KeyboardEvent) => ev.stopPropagation()}
         ></button>
@@ -1451,8 +1573,10 @@ class HomeKitManagerPanel extends LitElement {
           .text=${dialog.text}
           .confirmLabel=${dialog.confirmLabel}
           .cancelLabel=${t("cancel")}
+          .altLabel=${dialog.altLabel}
           ?danger=${dialog.danger}
           @confirm=${() => dialog.action()}
+          @alt=${() => dialog.alt?.()}
           @closed=${close}
         ></hkm-confirm>`;
       case "new":
@@ -2633,6 +2757,12 @@ class HomeKitManagerPanel extends LitElement {
         }
         .health-row {
           flex-wrap: wrap;
+        }
+        .health-body {
+          flex: 1 1 calc(100% - 50px);
+        }
+        .health-row > .btn {
+          margin-left: 50px;
         }
         .pairing-body {
           flex-direction: column;

@@ -133,6 +133,7 @@ export class HkmConfirm extends LitElement {
     text: { type: String },
     confirmLabel: { type: String },
     cancelLabel: { type: String },
+    altLabel: { type: String },
     danger: { type: Boolean },
   };
 
@@ -140,6 +141,8 @@ export class HkmConfirm extends LitElement {
   declare text: string;
   declare confirmLabel: string;
   declare cancelLabel: string;
+  /** Optional second choice instead of "cancel" (fires ``alt``). */
+  declare altLabel: string | undefined;
   declare danger: boolean;
 
   private _confirm() {
@@ -147,16 +150,17 @@ export class HkmConfirm extends LitElement {
     this.renderRoot.querySelector<HkmDialog>("hkm-dialog")?.close();
   }
 
+  private _secondary() {
+    if (this.altLabel) fire(this, "alt");
+    this.renderRoot.querySelector<HkmDialog>("hkm-dialog")?.close();
+  }
+
   render() {
     return html`
       <hkm-dialog .heading=${this.heading}>
         <p>${this.text}</p>
-        <button
-          slot="actions"
-          class="btn outlined"
-          @click=${() => this.renderRoot.querySelector<HkmDialog>("hkm-dialog")?.close()}
-        >
-          ${this.cancelLabel}
+        <button slot="actions" class="btn outlined" @click=${this._secondary}>
+          ${this.altLabel || this.cancelLabel}
         </button>
         <button
           slot="actions"

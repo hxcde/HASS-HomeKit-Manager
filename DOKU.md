@@ -25,6 +25,7 @@ Keine Umgebungsvariablen, keine Secrets.
 Hinweise:
 - **Codes** für Alarmanlage/Schloss stehen – wie bei der YAML-Konfiguration von HomeKit – im Klartext in `.storage/core.config_entries`. Das Panel zeigt gespeicherte Codes nie an, sie werden nur gesetzt oder gelöscht. Backups entsprechend schützen.
 - **Automatisch zuweisen:** Treffer = Label ODER Etage ODER Bereich, optional nur bestimmte Typen. Versteckte/Diagnose-Entitäten zählen nur über ein Label. Von Hand entfernte Treffer bleiben ausgeschlossen (im Regel-Dialog zurücksetzbar). Entitäten, die nicht mehr passen, werden nur entfernt, wenn die Regel sie hinzugefügt hat. Synchronisiert wird 15 s nach einer Änderung in Home Assistant, frühestens 2 min nach dem Start.
+- **Geregelte Thermostate:** Thermostate, die von **Better Thermostat** oder **Versatile Thermostat** (Typ „über Klima“) geregelt werden, erkennt HomeKit Manager über deren Config-Entries (`thermostat`/`cooler` bzw. `underlying_entity_ids`). In HomeKit gehört die regelnde Entität, nicht das Original: Beim Freigeben des Originals fragt das Panel nach, „Alle hinzufügen“ und Regeln nehmen automatisch die regelnde Entität. Das Original-Thermostat kann bewusst trotzdem freigegeben werden.
 - **Umbenennungen** von Entitäts-IDs werden sofort in alle Bridges/Einzelgeräte übernommen (inkl. verknüpfter Sensoren); das Gerät behält in Apple Home Raum und Szenen.
 - Bridge-Namen werden mDNS-tauglich gemacht (A–Z, Ziffern, Leerzeichen; ä→ae usw., 3–25 Zeichen).
 - Max. 149 Geräte pro Bridge (HomeKit-Limit 150 inkl. Bridge).
@@ -74,6 +75,7 @@ ruff check custom_components tests script
 | Fernseher/Kamera nur als Schalter oder ohne Bild | in Bridge statt Einzelgerät | Im Panel *Als Einzelgerät koppeln*, dann neuen Setup-Code in der Home-App scannen. |
 | Bridge zeigt „Diese Bridge nutzt Domain-Filter“ | angelegt/geändert über den Core-Dialog | *Bridge übernehmen*. |
 | Reparatur „HomeKit … enthält gelöschte Entitäten“ | Entität wurde in HA gelöscht | *Reparieren* → *Absenden* entfernt sie (ein Einzelgerät ohne Entität wird gelöscht). |
+| Thermostat zeigt in Apple Home die falsche Temperatur | Panel-Hinweis „Original-Thermostate freigegeben“ | *Durch Better Thermostat ersetzen* → *Übernehmen*; danach in der Home-App Raum/Szenen für das neue Gerät setzen. Wird die Better-Thermostat-Entität nicht erkannt: Integration geladen? Nur Entries mit genau einer Klima-Entität zählen. |
 | Regel fügt nichts hinzu | Vorschau im Regel-Dialog prüfen | Label an Entität **oder** Gerät setzen; Bereich/Etage zuordnen; Typ-Filter prüfen; Entität evtl. als Einzelgerät gekoppelt. |
 | Icon im Marketplace fehlt direkt nach der Installation | Browser hat den Platzhalter von vor der Installation gecacht | Seite neu laden (Strg+F5). Vor der Installation zeigt der Marketplace Icons nur für Katalog-Integrationen mit Release. |
 | Panel zeigt „Fehler: unauthorized“ | Benutzer ist kein Admin | Panel und API sind nur für Administratoren. |

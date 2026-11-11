@@ -222,6 +222,23 @@ const en = {
   missing_remove: "Remove from bridge",
   unavailable_title: "Not available right now",
   unavailable_text: "Assigned, but currently unavailable (integration not loaded or entity disabled):",
+  // Thermostats regulated by another entity (Better Thermostat …)
+  controlled_badge: "regulated by {integration}",
+  controlled_via_badge: "exposed via {integration}",
+  controlled_title: "Use {integration}?",
+  controlled_text:
+    "“{name}” is regulated by {integration} (“{controller}”). If you expose the thermostat itself, Apple Home bypasses that regulation and shows the temperature of its built-in sensor.",
+  controlled_use: "Expose {integration}",
+  controlled_original: "Expose original",
+  controlled_duplicate_title: "Already in HomeKit via {integration}",
+  controlled_duplicate_text:
+    "“{name}” is already exposed through {integration} (“{controller}”). Exposing it as well adds a second thermostat to Apple Home that bypasses the regulation.",
+  controlled_duplicate_confirm: "Expose anyway",
+  controlled_replaced: "Thermostats exposed via {integration}: {count}",
+  health_controlled_title: "Original thermostats exposed: {count}",
+  health_controlled_text:
+    "They are regulated by {integration}. Apple Home bypasses that regulation and shows the temperature of the built-in sensor.",
+  health_controlled_replace: "Replace with {integration}",
   // Categories
   cat_light: "Lights",
   cat_switch: "Switches",
@@ -452,6 +469,22 @@ const de: Strings = {
   unavailable_title: "Gerade nicht verfügbar",
   unavailable_text:
     "Zugewiesen, aber aktuell nicht verfügbar (Integration nicht geladen oder Entität deaktiviert):",
+  controlled_badge: "geregelt von {integration}",
+  controlled_via_badge: "über {integration} freigegeben",
+  controlled_title: "{integration} verwenden?",
+  controlled_text:
+    "„{name}“ wird von {integration} („{controller}“) geregelt. Gibst du das Thermostat selbst frei, umgeht Apple Home diese Regelung und zeigt die Temperatur des eingebauten Fühlers.",
+  controlled_use: "{integration} freigeben",
+  controlled_original: "Original freigeben",
+  controlled_duplicate_title: "Schon über {integration} in HomeKit",
+  controlled_duplicate_text:
+    "„{name}“ ist bereits über {integration} („{controller}“) freigegeben. Zusätzlich freigegeben erscheint ein zweites Thermostat in Apple Home, das die Regelung umgeht.",
+  controlled_duplicate_confirm: "Trotzdem freigeben",
+  controlled_replaced: "Über {integration} freigegebene Thermostate: {count}",
+  health_controlled_title: "Original-Thermostate freigegeben: {count}",
+  health_controlled_text:
+    "Sie werden von {integration} geregelt. Apple Home umgeht so die Regelung und zeigt die Temperatur des eingebauten Fühlers.",
+  health_controlled_replace: "Durch {integration} ersetzen",
   cat_light: "Licht",
   cat_switch: "Schalter",
   cat_climate: "Klima",

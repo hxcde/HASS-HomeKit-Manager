@@ -19,6 +19,7 @@ custom_components/homekit_manager/   Integration (wird so installiert)
   rules.py             Regeln (Label/Etage/Bereich/Typ), Store .storage/homekit_manager.rules
   sync.py              EntitySync: Registry-Listener für Umbenennungen, Repair-Issues, Regeln
   repairs.py           Fix-Flow „gelöschte Entitäten entfernen“
+  controllers.py       Erkennung geregelter Thermostate (Better/Versatile Thermostat)
   accessory_types.py   Vorhersage des HomeKit-Gerätetyps (Spiegel von core get_accessory)
   websocket_api.py     Websocket-Befehle homekit_manager/*
   compat.py            probatio/voluptuous-Kompatibilität (HA ≥ 2026.11 vs. älter)
@@ -59,6 +60,7 @@ docs/images/           Screenshots für README
 - **Filter-Konvention**: Eine Bridge gilt als „verwaltet“, wenn ihr Filter nur `include_entities` enthält. Leere Auswahl = `exclude_entity_globs: ["*"]` (ein komplett leerer Filter würde in Core *alle* Entitäten freigeben).
 - **`entity_options.py`**: `apply_patch()`/`validate_option()` für alle verwalteten `entity_config`-Schlüssel; verknüpfte Sensoren werden gegen die in Core vorhandenen `CONF_LINKED_*` gefiltert. `public_options()` ersetzt den Code durch `has_code` – der Code verlässt den Server nie.
 - **`rules.py` / `sync.py`**: Regel = Labels ∪ Etagen ∪ Bereiche, optional eingeschränkt auf Typen (Domains). `members` = von der Regel hinzugefügt, `exclude` = vom Nutzer trotz Treffer entfernt. `EntitySync` hört auf Entity-/Device-/Area-/Label-/Floor-Registry und neue States; Umbenennungen (`old_entity_id`) sofort, Regel-Sync und Repair-Prüfung entprellt und erst nach einer Startphase (120 s), damit spät ladende Integrationen nicht als gelöscht gelten.
+- **`controllers.py`**: `async_controllers()` liest die Config-Entries von `better_thermostat` und `versatile_thermostat`; jede mit genau einer Klima-Entität (mit State) ist ein Regler, alle in `data`/`options` genannten `climate.*`-IDs sind die geregelten Thermostate. `async_entities` liefert `controlled_by` je Entität und `controllers`; `evaluate_rule` ersetzt geregelte Thermostate durch ihren Regler. Das Panel fragt beim Freigeben nach (`_onSwitch`), ersetzt bei „Alle hinzufügen“ und zeigt freigegebene Originale im Hinweisbereich.
 - **`accessory_types.py`**: `resolve_accessory_type()` spiegelt die Typentscheidung von `homekit.accessories.get_accessory`; Ergebnis wird gegen die in Core registrierten Typen geprüft. `entity_type_options()` liest `SWITCH_TYPES`/`FAN_TYPES`/`CLIMATE_TYPES` aus Core.
 - **`websocket_api.py`**: Befehle `bridges`, `entities`, `pairing`, `bridge/create|settings|assign|adopt|restart|unpair|delete|remove_missing`, `accessory/create`, `entity/options`, `rules/set|preview`; alle `require_admin`. `BridgeError.code` wird als Fehlercode ans Panel gegeben.
 - **Panel (`panel.ts`)**: lädt Bridges + Entitäten, hält Änderungen als Entwurf (`_draft`, `_draftConfig`) bis „Übernehmen“, pollt alle 5 s den Bridge-Status (Kopplung, PIN-Wechsel nach Neustart), drosselt `hass`-Updates auf 1/s. Nutzt `ha-menu-button`, `ha-state-icon` (mit Fallback) und HA-Events `hass-notification`/`hass-more-info`.

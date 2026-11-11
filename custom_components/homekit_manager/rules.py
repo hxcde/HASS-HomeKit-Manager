@@ -21,6 +21,7 @@ from homeassistant.helpers.storage import Store
 
 from .accessory_types import SUPPORTED_DOMAINS, resolve_accessory_type
 from .const import RULES_STORAGE_KEY, RULES_STORAGE_VERSION
+from .controllers import async_controlled_by
 
 
 @dataclass
@@ -139,6 +140,8 @@ def evaluate_rule(hass: HomeAssistant, rule: Rule, taken: set[str]) -> set[str]:
 
     ``taken`` are entities paired as standalone accessory; they never join a
     bridge automatically. Hidden and diagnostic entities only match by label.
+    A thermostat regulated by e.g. Better Thermostat is replaced by the
+    regulating entity, so HomeKit does not bypass the regulation.
     """
     if not rule.has_criteria:
         return set()
@@ -150,6 +153,7 @@ def evaluate_rule(hass: HomeAssistant, rule: Rule, taken: set[str]) -> set[str]:
     floors = set(rule.floors)
     domains = set(rule.domains)
     place_rule = bool(labels or areas or floors)
+    controlled_by = async_controlled_by(hass)
 
     result: set[str] = set()
     for state in hass.states.async_all():
@@ -178,6 +182,10 @@ def evaluate_rule(hass: HomeAssistant, rule: Rule, taken: set[str]) -> set[str]:
             ):
                 continue
         if reg and (reg.entity_category or reg.hidden_by) and not label_match:
+            continue
+        if (controller := controlled_by.get(entity_id)) is not None:
+            if controller not in taken:
+                result.add(controller)
             continue
         result.add(entity_id)
     return result

@@ -106,7 +106,16 @@ export interface EntityInfo {
   accessory_type: string | null;
   supported: boolean;
   needs_accessory_mode: boolean;
+  /** Climate entity regulating this thermostat (Better Thermostat …). */
+  controlled_by: string | null;
   bridges: string[];
+}
+
+/** A climate entity that regulates other thermostats. */
+export interface ControllerInfo {
+  integration: string;
+  title: string;
+  controls: string[];
 }
 
 export interface EntitiesResponse {
@@ -119,6 +128,7 @@ export interface EntitiesResponse {
   link_candidates: LinkCandidate[];
   type_options: Record<string, string[]>;
   max_accessories: number;
+  controllers: Record<string, ControllerInfo>;
 }
 
 export interface Pairing {
