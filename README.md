@@ -44,6 +44,7 @@ Danach: Einstellungen → Geräte & Dienste → *Integration hinzufügen* → **
 
 - [CODEINFO.md](./CODEINFO.md) — Code-Struktur und Aufbau
 - [DOKU.md](./DOKU.md) — Admin- und Wartungsdoku (Betrieb, Ports, Troubleshooting, Release)
+- [CHANGELOG.md](./CHANGELOG.md) — Änderungen je Version
 
 ## English
 

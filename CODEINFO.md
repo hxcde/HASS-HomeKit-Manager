@@ -40,8 +40,10 @@ frontend/              Quellcode des Panels
   vite.config.ts       Build nach custom_components/homekit_manager/frontend/
 tests/                 pytest (pytest-homeassistant-custom-component)
 script/core_requirements.py  gibt Pip-Requirements der benötigten Core-Integrationen aus
+script/release_notes.py      liest den Abschnitt einer Version aus CHANGELOG.md (Release-Workflow)
+CHANGELOG.md                 Änderungen je Version, Quelle der Release-Notes
 docs/images/           Screenshots für README
-.github/workflows/     validate (hassfest, HACS-Action), tests, release
+.github/workflows/     validate (hassfest, HACS-Action), tests, release (Tag-Push → GitHub-Release)
 ```
 
 ## Module & Zuständigkeiten

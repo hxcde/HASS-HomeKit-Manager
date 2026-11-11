@@ -37,8 +37,9 @@ Hinweise:
 Release (Marketplace/HACS verlangt passende Version):
 1. `version` in `custom_components/homekit_manager/manifest.json` und `frontend/package.json` erhöhen.
 2. Panel bauen: `cd frontend && npm ci && npm run build` – das Bundle unter `custom_components/homekit_manager/frontend/` wird mit eingecheckt.
-3. Commit, Tag `vX.Y.Z` bzw. `X.Y.Z` = Manifest-Version, GitHub-Release veröffentlichen. Workflow `release.yml` prüft Tag ↔ Manifest und hängt `homekit_manager.zip` an.
-4. Für die Aufnahme in den Katalog (hacs/default): Repo öffentlich, Lizenz (MIT, `LICENSE`), Beschreibung und Topics gesetzt (GitHub → Repo → *About* → Zahnrad), Issues aktiviert, Workflows `validate.yml` (hassfest + HACS-Action) grün.
+3. Abschnitt `## X.Y.Z – Datum` in `CHANGELOG.md` ergänzen, alles über einen PR nach `main` mergen.
+4. Auf `main` den Tag pushen: `git tag X.Y.Z && git push origin X.Y.Z`. Workflow `release.yml` prüft Tag ↔ Manifest, erstellt das GitHub-Release mit den Notes aus `CHANGELOG.md` (`script/release_notes.py`) und hängt `homekit_manager.zip` an. Tags mit Bindestrich (z. B. `0.3.0-beta.1`) werden als Pre-Release veröffentlicht.
+5. Für die Aufnahme in den Katalog (hacs/default): Repo öffentlich, Lizenz (MIT, `LICENSE`), Beschreibung und Topics gesetzt (GitHub → Repo → *About* → Zahnrad), Issues aktiviert, Workflows `validate.yml` (hassfest + HACS-Action) grün.
 
 CI:
 - `validate.yml`: hassfest, HACS-Action (`category: integration`), täglich und bei Push/PR.
