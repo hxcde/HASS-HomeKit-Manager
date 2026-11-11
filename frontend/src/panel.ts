@@ -110,7 +110,7 @@ const storage = {
 
 class HomeKitManagerPanel extends LitElement {
   static properties = {
-    narrow: { type: Boolean },
+    narrow: { type: Boolean, reflect: true },
     panel: { attribute: false },
     _bridges: { state: true },
     _instances: { state: true },
@@ -1589,18 +1589,35 @@ class HomeKitManagerPanel extends LitElement {
         font-family: var(--ha-font-family-body, var(--paper-font-body1_-_font-family, Roboto, sans-serif));
         -webkit-font-smoothing: antialiased;
       }
+      /* The panel is registered with handle_safe_area, so it extends behind
+         the status bar / home indicator of the companion apps itself. */
+      :host {
+        --hkm-inset-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+        --hkm-inset-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+        --hkm-inset-left: 0px;
+        --hkm-inset-right: var(
+          --safe-area-content-inset-right,
+          var(--safe-area-inset-right, env(safe-area-inset-right, 0px))
+        );
+      }
+      :host([narrow]) {
+        --hkm-inset-left: var(
+          --safe-area-content-inset-left,
+          var(--safe-area-inset-left, env(safe-area-inset-left, 0px))
+        );
+      }
       .toolbar {
         display: flex;
         align-items: center;
         gap: 4px;
         flex: none;
-        height: var(--header-height, 56px);
-        padding: 0 8px 0 4px;
+        height: calc(var(--header-height, 56px) + var(--hkm-inset-top));
+        padding: var(--hkm-inset-top) calc(8px + var(--hkm-inset-right)) 0
+          calc(4px + var(--hkm-inset-left));
         box-sizing: border-box;
         background: var(--app-header-background-color, var(--hkm-card));
         color: var(--app-header-text-color, var(--hkm-text));
         border-bottom: var(--app-header-border-bottom, 1px solid var(--hkm-divider));
-        padding-top: env(safe-area-inset-top);
       }
       .toolbar-title {
         flex: 1;
@@ -1615,11 +1632,12 @@ class HomeKitManagerPanel extends LitElement {
         flex: 1;
         overflow-y: auto;
         overscroll-behavior: contain;
+        padding: 0 var(--hkm-inset-right) 0 var(--hkm-inset-left);
       }
       .content {
         max-width: 1080px;
         margin: 0 auto;
-        padding: 20px 16px calc(32px + env(safe-area-inset-bottom));
+        padding: 20px 16px calc(32px + var(--hkm-inset-bottom));
         box-sizing: border-box;
         display: flex;
         flex-direction: column;
@@ -2336,7 +2354,7 @@ class HomeKitManagerPanel extends LitElement {
       /* Apply bar */
       .apply-bar {
         position: sticky;
-        bottom: calc(16px + env(safe-area-inset-bottom));
+        bottom: calc(16px + var(--hkm-inset-bottom));
         z-index: 2;
         display: flex;
         align-items: center;
@@ -2578,7 +2596,7 @@ class HomeKitManagerPanel extends LitElement {
       }
       @media (max-width: 520px) {
         .content {
-          padding: 12px 10px calc(24px + env(safe-area-inset-bottom));
+          padding: 12px 10px calc(24px + var(--hkm-inset-bottom));
           gap: 12px;
         }
         .hero-main,

@@ -2,6 +2,11 @@
 
 Alle nennenswerten Änderungen. Versionen folgen [SemVer](https://semver.org/lang/de/); der Tag eines Releases entspricht der `version` in `custom_components/homekit_manager/manifest.json`.
 
+## 0.2.1 – 2026-11-11
+
+### Behoben
+- Kopfleiste in der iPhone-/Android-App: Der Titel überlappt nicht mehr mit der Statusleiste bzw. der Trennlinie. Das Panel berücksichtigt die Safe-Area (Statusleiste, Notch, Home-Indikator) jetzt selbst; die Leiste „Übernehmen“ bleibt über dem Home-Indikator.
+
 ## 0.2.0 – 2026-11-11
 
 Erste veröffentlichte Version.
